@@ -1,4 +1,13 @@
 (1
+ (nukneval .
+           [(1 1)
+            ((cl-lib
+              (0 5)))
+            "Nuke and reevaluate an elisp buffer." single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/nukneval.el"))])
  (itch .
        [(1 2)
         nil "Scratch buffer tools." single
