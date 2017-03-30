@@ -1,4 +1,13 @@
 (1
+ (become .
+         [(1 1)
+          ((cl-lib
+            (0 5)))
+          "Tools for transforming a buffer." single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/become.el"))])
  (moving .
          [(1 2)
           nil "Extra commands for moving about a buffer." single
