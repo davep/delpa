@@ -1,4 +1,13 @@
 (1
+ (unbind .
+         [(1 4)
+          ((cl-lib
+            (0 5)))
+          "Commands for unbinding things" single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/unbind.el"))])
  (nukneval .
            [(1 1)
             ((cl-lib
