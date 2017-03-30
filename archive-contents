@@ -1,4 +1,11 @@
 (1
+ (xray .
+       [(3 0)
+        nil "Display internal object structures in a temporary buffer." single
+        ((:authors
+          ("Vinicius Jose Latorre" . "viniciusjl@ig.com.br"))
+         (:maintainer "Vinicius Jose Latorre" . "viniciusjl@ig.com.br")
+         (:url . "http://www.emacswiki.org/cgi-bin/wiki/ViniciusJoseLatorre"))])
  (xbase .
         [(1 38)
          ((cl-lib
