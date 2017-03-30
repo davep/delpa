@@ -1,4 +1,11 @@
 (1
+ (itch .
+       [(1 2)
+        nil "Scratch buffer tools." single
+        ((:authors
+          ("Dave Pearson" . "davep@davep.org"))
+         (:maintainer "Dave Pearson" . "davep@davep.org")
+         (:url . "https://github.com/davep/itch.el"))])
  (insert .
          [(1 1)
           nil "Insert stuff." single
