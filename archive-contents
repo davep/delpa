@@ -1,4 +1,13 @@
 (1
+ (binclock .
+           [(1 8)
+            ((cl-lib
+              (0 5)))
+            "Display the current time using a binary clock." single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/binclock.el"))])
  (fscroll .
           [(1 1)
            nil "Make scroll-{up,down} go all the way." single
