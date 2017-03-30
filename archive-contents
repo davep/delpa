@@ -1,4 +1,11 @@
 (1
+ (insert .
+         [(1 1)
+          nil "Insert stuff." single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/insert.el"))])
  (become .
          [(1 1)
           ((cl-lib
