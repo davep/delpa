@@ -1,4 +1,11 @@
 (1
+ (webinfo .
+          [(1 1)
+           nil "Get information about a web server." single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:url . "https://github.com/davep/webinfo.el"))])
  (unbind .
          [(1 4)
           ((cl-lib
