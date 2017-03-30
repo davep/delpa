@@ -1,4 +1,11 @@
 (1
+ (fscroll .
+          [(1 1)
+           nil "Make scroll-{up,down} go all the way." single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:url . "https://github.com/davep/fscroll.el"))])
  (csrclr .
          [(1 3)
           nil "Set cursor colour depending on environment." single
