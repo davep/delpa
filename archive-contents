@@ -1,6 +1,6 @@
 (1
  (binclock .
-           [(1 8)
+           [(1 9)
             ((cl-lib
               (0 5)))
             "Display the current time using a binary clock." single
