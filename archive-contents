@@ -1,4 +1,13 @@
 (1
+ (xbase .
+        [(1 38)
+         ((cl-lib
+           (0 5)))
+         "A mode for editing Xbase programs." single
+         ((:authors
+           ("Mike Romberg" . "romberg@fsl.noaa.gov"))
+          (:maintainer "Mike Romberg" . "romberg@fsl.noaa.gov")
+          (:url . "https://github.com/davep/xbase.el"))])
  (davep-org .
             [(2 0)
              nil "Tools for managing my web sites." single
