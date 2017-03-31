@@ -1,4 +1,13 @@
 (1
+ (handyurl .
+           [(2 1)
+            ((cl-lib
+              (0 5)))
+            "Pop up a list of URLs and select for pasting." single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/handyurl.el"))])
  (longmacs .
            [(1 0)
             nil "Make it a little harder to deny emacs is an OS" single
