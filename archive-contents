@@ -1,4 +1,11 @@
 (1
+ (longmacs .
+           [(1 0)
+            nil "Make it a little harder to deny emacs is an OS" single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/longmacs.el"))])
  (xray .
        [(3 0)
         nil "Display internal object structures in a temporary buffer." single
