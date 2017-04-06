@@ -1,4 +1,13 @@
 (1
+ (icmp-info .
+            [(2 0)
+             ((cl-lib
+               (0 5)))
+             "ICMP information tool." single
+             ((:authors
+               ("Dave Pearson" . "davep@davep.org"))
+              (:maintainer "Dave Pearson" . "davep@davep.org")
+              (:url . "https://github.com/davep/icmp-info.el"))])
  (handyurl .
            [(2 1)
             ((cl-lib
