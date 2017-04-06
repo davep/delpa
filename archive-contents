@@ -108,7 +108,7 @@
            (:maintainer "Dave Pearson" . "davep@davep.org")
            (:url . "https://github.com/davep/insert.el"))])
  (become .
-         [(1 1)
+         [(1 2)
           ((cl-lib
             (0 5)))
           "Tools for transforming a buffer." single
