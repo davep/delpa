@@ -1,4 +1,11 @@
 (1
+ (org-davep .
+            [(1 0)
+             nil "My own little additions to org-mode" single
+             ((:authors
+               ("Dave Pearson" . "davep@davep.org"))
+              (:maintainer "Dave Pearson" . "davep@davep.org")
+              (:url . "https://github.com/davep/org-davep.el"))])
  (icmp-info .
             [(2 1)
              ((cl-lib
