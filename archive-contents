@@ -1,6 +1,6 @@
 (1
  (winsplit .
-           [(1 0)
+           [(1 1)
             nil "Simple commands for creating new windows" single
             ((:authors
               ("Dave Pearson" . "davep@davep.org"))
