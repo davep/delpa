@@ -1,4 +1,11 @@
 (1
+ (winsplit .
+           [(1 0)
+            nil "Simple commands for creating new windows" single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/winsplit.el"))])
  (icmp-info .
             [(2 1)
              ((cl-lib
