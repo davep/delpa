@@ -62,7 +62,7 @@
                    (:maintainer "Dave Pearson" . "davep@davep.org")
                    (:url . "https://github.com/davep/constellations.el"))])
  (binclock .
-           [(1 9)
+           [(1 10)
             ((cl-lib
               (0 5)))
             "Display the current time using a binary clock." single
