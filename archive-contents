@@ -1,4 +1,13 @@
 (1
+ (ngn .
+      [(1 6)
+       ((cl-lib
+         (0 5)))
+       "Quickly insert a newsgroup name." single
+       ((:authors
+         ("Dave Pearson" . "davep@davep.org"))
+        (:maintainer "Dave Pearson" . "davep@davep.org")
+        (:url . "https://github.com/davep/ngn.el"))])
  (winsplit .
            [(1 1)
             nil "Simple commands for creating new windows" single
