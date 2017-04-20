@@ -1,4 +1,11 @@
 (1
+ (setup-compile .
+                [(1 0)
+                 nil "Command for setting up a compile command." single
+                 ((:authors
+                   ("Dave Pearson" . "davep@davep.org"))
+                  (:maintainer "Dave Pearson" . "davep@davep.org")
+                  (:url . "https://github.com/davep/setup-compile.el"))])
  (ngn .
       [(1 6)
        ((cl-lib
