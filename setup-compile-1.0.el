@@ -19,6 +19,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defun setup-compile (default-command)
   "Setup the compile command for a buffer.
 
