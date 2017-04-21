@@ -1,6 +1,6 @@
 (1
  (nuke-buffers .
-               [(1 1)
+               [(1 2)
                 ((dash
                   (2 12)))
                 "Safely kill as many buffers as possible" single
