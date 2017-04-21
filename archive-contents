@@ -1,6 +1,6 @@
 (1
  (setup-compile .
-                [(1 0)
+                [(1 1)
                  nil "Command for setting up a compile command." single
                  ((:authors
                    ("Dave Pearson" . "davep@davep.org"))
