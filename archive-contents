@@ -1,4 +1,13 @@
 (1
+ (nuke-buffers .
+               [(1 0)
+                ((dash
+                  (2 12)))
+                "Safely kill as many buffers as possible" single
+                ((:authors
+                  ("Dave Pearson" . "davep@davep.org"))
+                 (:maintainer "Dave Pearson" . "davep@davep.org")
+                 (:url . "https://github.com/davep/nuke-buffers.el"))])
  (setup-compile .
                 [(1 1)
                  nil "Command for setting up a compile command." single
