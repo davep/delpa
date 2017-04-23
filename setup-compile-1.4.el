@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.3
+;; Version: 1.4
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/setup-compile.el
 
@@ -25,8 +25,8 @@
 
 (defcustom setup-compile-default-commands
   (list
-   (c-mode   . "gcc -Wall -O2 {{src}} -o {{exe}}")
-   (c++-mode . "g++ -Wall -O2 {{src}} -o {{exe}}"))
+   (cons 'c-mode   "gcc -Wall -O2 {{src}} -o {{exe}}")
+   (cons 'c++-mode "g++ -Wall -O2 {{src}} -o {{exe}}"))
   "List of default commands based on major mode names."
   :type '(repeat
           (cons :tag "Compile command"
