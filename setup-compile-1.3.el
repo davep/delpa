@@ -2,9 +2,12 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.2
+;; Version: 1.3
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/setup-compile.el
+
+;; setup-compile.el is free software distributed under the terms of the GNU
+;; General Public Licence, version 2. For details see the file COPYING.
 
 ;;; Commentary:
 ;;
@@ -15,10 +18,21 @@
 
 ;;; Code:
 
-(defvar setup-compile-default-commands
-  '((c-mode   . "gcc -Wall -O2 {{src}} -o {{exe}}")
-    (c++-mode . "g++ -Wall -O2 {{src}} -o {{exe}}"))
-  "List of default commands based on major mode names.")
+(defgroup setup-compile nil
+  "Command for setting up a compile command."
+  :group  'convenience
+  :prefix "setup-compile-")
+
+(defcustom setup-compile-default-commands
+  (list
+   (c-mode   . "gcc -Wall -O2 {{src}} -o {{exe}}")
+   (c++-mode . "g++ -Wall -O2 {{src}} -o {{exe}}"))
+  "List of default commands based on major mode names."
+  :type '(repeat
+          (cons :tag "Compile command"
+                (symbol :tag "Major mode")
+                (string :tag "Compile command")))
+  :group 'setup-compile)
 
 ;;;###autoload
 (defun setup-compile (&optional default-command)
