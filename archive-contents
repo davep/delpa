@@ -9,7 +9,7 @@
                  (:maintainer "Dave Pearson" . "davep@davep.org")
                  (:url . "https://github.com/davep/nuke-buffers.el"))])
  (setup-compile .
-                [(1 4)
+                [(1 5)
                  nil "Command for setting up a compile command." single
                  ((:authors
                    ("Dave Pearson" . "davep@davep.org"))
