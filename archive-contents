@@ -1,4 +1,11 @@
 (1
+ (macdob .
+         [(1 0)
+          nil "Report a Mac's \"date of birth\"" single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/macdob.el"))])
  (nuke-buffers .
                [(1 3)
                 ((dash
