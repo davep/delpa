@@ -1,4 +1,13 @@
 (1
+ (smartsig .
+           [(1 14)
+            ((cl-lib
+              (0 5)))
+            "Smart signature selection based on message content." single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/smartsig.el"))])
  (macdob .
          [(1 0)
           nil "Report a Mac's \"date of birth\"" single
