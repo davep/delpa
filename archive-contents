@@ -1,11 +1,11 @@
 (1
- (signature .
-            [(1 0)
-             nil "Tools for manipulating email/news signatures" single
-             ((:authors
-               ("Dave Pearson" . "davep@davep.org"))
-              (:maintainer "Dave Pearson" . "davep@davep.org")
-              (:url . "https://github.com/davep/signature.el"))])
+ (msig .
+       [(1 0)
+        nil "Tools for manipulating email/news signatures" single
+        ((:authors
+          ("Dave Pearson" . "davep@davep.org"))
+         (:maintainer "Dave Pearson" . "davep@davep.org")
+         (:url . "https://github.com/davep/msig.el"))])
  (smartsig .
            [(1 14)
             ((cl-lib
