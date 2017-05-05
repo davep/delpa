@@ -1,4 +1,11 @@
 (1
+ (is-a .
+       [(1 0)
+        nil "Tools for testing the environment we're running in" single
+        ((:authors
+          ("Dave Pearson" . "davep@davep.org"))
+         (:maintainer "Dave Pearson" . "davep@davep.org")
+         (:url . "https://github.com/davep/is-a.el"))])
  (msig .
        [(1 0)
         nil "Tools for manipulating email/news signatures" single
