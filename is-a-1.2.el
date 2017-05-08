@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.1
+;; Version: 1.2
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/is-a.el
 
@@ -12,7 +12,7 @@
 
 ;;; Commentary:
 ;;
-;; is-a.el provides tools for testing the environment we're runnuing in.
+;; is-a.el provides tools for testing the environment we're running in.
 ;;
 ;; Note that these tests aren't intended to be comprehensive. They're just
 ;; good enough to cover the range of machines and environments I own and
@@ -21,24 +21,23 @@
 ;;; Code:
 
 ;;;###autoload
-(defconst is-a-win32p
+(defconst is-a-win32-p
   (eq system-type 'windows-nt)
   "Are we running on a WinTel system?")
 
 ;;;###autoload
-(defconst is-a-linuxp
-  (or (eq system-type 'gnu/linux)
-      (eq system-type 'linux))
+(defconst is-a-linux-p
+  (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux system?")
 
 ;;;###autoload
 (defconst is-a-linux-x-p
-  (and window-system is-a-linuxp)
+  (and window-system is-a-linux-p)
   "Are we running under X on a GNU/Linux system?")
 
 ;;;###autoload
 (defconst is-a-linux-terminal-p
-  (and (not window-system) is-a-linuxp)
+  (and (not window-system) is-a-linux-p)
   "Are we running on GNU/Linux, in a terminal?")
 
 ;;;###autoload
@@ -62,23 +61,23 @@
   "Are we running in an macOS window?")
 
 ;;;###autoload
-(defconst is-a-unixp
-  (or is-a-linuxp is-a-macOS-p)
+(defconst is-a-unix-p
+  (or is-a-linux-p is-a-macOS-p)
   "Are we on some form of Unix?")
 
 ;;;###autoload
 (defconst is-a-unix-window-p
-  (and is-a-unixp window-system)
+  (and is-a-unix-p window-system)
   "Are we on some form of Unix and in a graphical environment?")
 
 ;;;###autoload
 (defconst is-a-unix-terminal-p
-  (and is-a-unixp (not window-system))
+  (and is-a-unix-p (not window-system))
   "Are we on some form of Unix but not running as a graphical app?")
 
 ;;;###autoload
-(defconst is-a-rootp
-  (and is-a-unixp (zerop (user-uid)))
+(defconst is-a-root-user-p
+  (and is-a-unix-p (zerop (user-uid)))
   "Are we running as root?")
 
 (provide 'is-a)
