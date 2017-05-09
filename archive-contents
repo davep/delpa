@@ -14,7 +14,7 @@
          (:maintainer "Dave Pearson" . "davep@davep.org")
          (:url . "https://github.com/davep/msig.el"))])
  (smartsig .
-           [(1 14)
+           [(1 15)
             ((cl-lib
               (0 5)))
             "Smart signature selection based on message content." single
