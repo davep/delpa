@@ -1,6 +1,6 @@
 (1
  (expando .
-          [(1 1)
+          [(1 2)
            nil "Quickly expand macros for easy reading/checking" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))

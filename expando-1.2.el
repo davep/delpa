@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.1
+;; Version: 1.2
 ;; Keywords: lisp
 ;; URL: https://github.com/davep/expando.el
 
@@ -17,24 +17,20 @@
 
 ;;; Code:
 
+(require 'thingatpt)
+
+;;;###autoload
 (defun expando-macro (&optional all)
   "Attempt to expand the expression at `point'.
-
-The expansion is displayed in a help window.
 
 By default `macroexpand' is used. Prefix a call to this function
 with \\[universal-argument] (or pass ALL as a non-nil value) to
 have `maxroexpand-all' be used."
   (interactive "P")
-  (save-excursion
-    (beginning-of-defun)
-    (let ((form (read (current-buffer))))
-      (with-current-buffer (get-buffer-create "*Expando Macro*")
-        (setf (buffer-string) "")
-        (emacs-lisp-mode)
-        (switch-to-buffer-other-window (current-buffer))
-        (pp (if all (macroexpand-all form) (macroexpand form))
-            (current-buffer))))))
+  (let ((form (read (thing-at-point 'list t))))
+    (with-current-buffer-window "*Expando Macro*" nil nil
+      (emacs-lisp-mode)
+      (pp (funcall (if all #'macroexpand-all #'macroexpand) form)))))
 
 (provide 'expando)
 
