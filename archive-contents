@@ -94,7 +94,7 @@
              (:maintainer "Dave Pearson" . "davep@davep.org")
              (:url . "https://github.com/davep/handyurl.el"))])
  (longmacs .
-           [(1 2)
+           [(1 3)
             ((bind-key
               (1 0)))
             "Make it a little harder to deny emacs is an OS" single
