@@ -1,6 +1,6 @@
 (1
  (slstats .
-          [(1 2)
+          [(1 3)
            ((cl-lib
              (0 5)))
            "Acquire and display stats about Second Life" single
