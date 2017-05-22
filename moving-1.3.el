@@ -2,11 +2,9 @@
 ;; Copyright 2000-2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.2
+;; Version: 1.3
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/moving.el
-
-;;;###autoload
 
 ;;; Commentary:
 ;;
@@ -41,6 +39,20 @@
          (back-to-indentation))
         (t
          (end-of-line))))
+
+;;;###autoload
+(defun moving-backward-page (&optional count)
+  "Call `backward-page' with COUNT then move to start of line."
+  (interactive "p")
+  (backward-page count)
+  (beginning-of-line))
+
+;;;###autoload
+(defun moving-forward-page (&optional count)
+  "Call `forward-page' with COUNT them move to start of line."
+  (interactive "p")
+  (forward-page count)
+  (beginning-of-line))
 
 (provide 'moving)
 
