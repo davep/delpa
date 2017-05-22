@@ -1,13 +1,4 @@
 (1
- (slstats .
-          [(1 4)
-           ((cl-lib
-             (0 5)))
-           "Acquire and display stats about Second Life" single
-           ((:authors
-             ("Dave Pearson" . "davep@davep.org"))
-            (:maintainer "Dave Pearson" . "davep@davep.org")
-            (:url . "https://github.com/davep/slstats.el"))])
  (expando .
           [(1 4)
            nil "Quickly expand macros for easy reading/checking" single
