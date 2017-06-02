@@ -3,7 +3,7 @@
 
 ;; Author: Dave Pearson <davep@davep.org>
 ;; Version: 1.0
-;; Keywords: docs
+;; Keywords: docs, help
 ;; URL: https://github.com/davep/cheat-sh.el
 ;; Package-Requires: ((emacs "24"))
 
@@ -21,6 +21,12 @@
 (defconst cheat-sh-url "http://cheat.sh/%s?T"
   "URL for cheat.sh.")
 
+(defconst cheat-sh-user-agent "cheat-sh.el (curl)"
+  "User agent to send to cheat.sh")
+
+(defvar cheat-sh-sheet-list nil
+  "List of all available sheets.")
+
 (defun cheat-sh-get (thing)
   "Get THING from cheat.sh."
   (with-current-buffer
@@ -29,16 +35,22 @@
       ;; HTML. See https://goo.gl/8gh95X for what I mean. (I'd have thought
       ;; it would make more sense to look for a requested content type, or
       ;; perhaps both?)
-      (let ((url-request-extra-headers '(("User-Agent" . "curl (cheat-sh.el)"))))
+      (let ((url-request-extra-headers `(("User-Agent" . ,cheat-sh-user-agent))))
         (url-retrieve-synchronously (format cheat-sh-url (url-hexify-string thing)) t t))
     (setf (point) (point-min))
     (when (search-forward-regexp "^$" nil t)
       (buffer-substring (point) (point-max)))))
 
+(defun cheat-sh-sheet-list ()
+  "Return the list of all available sheets."
+  (unless cheat-sh-sheet-list
+    (setq cheat-sh-sheet-list (split-string (cheat-sh-get ":list") "\n")))
+  cheat-sh-sheet-list)
+
 ;;;###autoload
 (defun cheat-sh (thing)
   "Look up THING on cheat.sh and display the result."
-  (interactive "sLookup: ")
+  (interactive (list (completing-read "Lookup: " (cheat-sh-sheet-list))))
   (let ((result (cheat-sh-get thing)))
     (if result
         (with-help-window "*cheat.sh*"
@@ -71,7 +83,7 @@
 Either gets a topic list for subject THING, or simply gets a list
 of all available topics on cheat.sh if THING is supplied as an
 empty string."
-  (interactive "sList help for: ")
+  (interactive (list (completing-read "List sheets for: " (cheat-sh-sheet-list))))
   (cheat-sh (format "%s/:list" thing)))
 
 (provide 'cheat-sh)
