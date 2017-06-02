@@ -12,7 +12,7 @@
 ;; For details see the file COPYING.
 
 ;;; Commentary:
-;; 
+;;
 ;; cheat-sh.el provides a simple Emacs interface for looking things up on
 ;; cheat.sh.
 
@@ -44,6 +44,35 @@
         (with-help-window "*cheat.sh*"
           (princ result))
       (error "Can't find anything for %s on cheat.sh" thing))))
+
+;;;###autoload
+(defun cheat-sh-region (start end)
+  "Look up the text between START and END on cheat.sh."
+  (interactive "r")
+  (deactivate-mark)
+  (cheat-sh (buffer-substring-no-properties start end)))
+
+;;;###autoload
+(defun cheat-sh-maybe-region ()
+  "If region is active lookup content of region, otherwise prompt."
+  (interactive)
+  (call-interactively (if mark-active #'cheat-sh-region #'cheat-sh)))
+
+;;;###autoload
+(defun cheat-sh-help ()
+  "Get help on using cheat.sh."
+  (interactive)
+  (cheat-sh ":help"))
+
+;;;###autoload
+(defun cheat-sh-list (thing)
+  "Get a list of topics available on cheat.sh.
+
+Either gets a topic list for subject THING, or simply gets a list
+of all available topics on cheat.sh if THING is supplied as an
+empty string."
+  (interactive "sList help for: ")
+  (cheat-sh (format "%s/:list" thing)))
 
 (provide 'cheat-sh)
 
