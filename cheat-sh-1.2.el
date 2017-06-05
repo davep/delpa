@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.0
+;; Version: 1.2
 ;; Keywords: docs, help
 ;; URL: https://github.com/davep/cheat-sh.el
 ;; Package-Requires: ((emacs "24"))
@@ -22,7 +22,15 @@
   "URL for cheat.sh.")
 
 (defconst cheat-sh-user-agent "cheat-sh.el (curl)"
-  "User agent to send to cheat.sh")
+  "User agent to send to cheat.sh.
+
+Note that \"curl\" should ideally be included in the user agent
+string because of the way cheat.sh works.
+
+cheat.sh looks for a specific set of clients in the user
+agent (see https://goo.gl/8gh95X for this) to decide if it should
+deliver plain text rather than HTML. cheat-sh.el requires plain
+text.")
 
 (defvar cheat-sh-sheet-list nil
   "List of all available sheets.")
@@ -30,11 +38,6 @@
 (defun cheat-sh-get (thing)
   "Get THING from cheat.sh."
   (with-current-buffer
-      ;; Here I "fake" the user agent. I do this because I want plain text
-      ;; but cheat.sh uses the User-Agent to decide if it should send it or
-      ;; HTML. See https://goo.gl/8gh95X for what I mean. (I'd have thought
-      ;; it would make more sense to look for a requested content type, or
-      ;; perhaps both?)
       (let ((url-request-extra-headers `(("User-Agent" . ,cheat-sh-user-agent))))
         (url-retrieve-synchronously (format cheat-sh-url (url-hexify-string thing)) t t))
     (setf (point) (point-min))
@@ -85,6 +88,20 @@ of all available topics on cheat.sh if THING is supplied as an
 empty string."
   (interactive (list (completing-read "List sheets for: " (cheat-sh-sheet-list))))
   (cheat-sh (format "%s/:list" thing)))
+
+;;;###autoload
+(defun cheat-sh-search (thing)
+  "Search for THING on cheat.sh and display the result."
+  (interactive "sSearch: ")
+  (cheat-sh (concat "~" thing)))
+
+;;;###autoload
+(defun cheat-sh-search-topic (topic thing)
+  "Search TOPIC for THING on cheat.sh and display the result."
+  (interactive
+   (list (completing-read "Topic: " (cheat-sh-sheet-list))
+         (read-string "Search: ")))
+  (cheat-sh (concat topic "/~" thing)))
 
 (provide 'cheat-sh)
 
