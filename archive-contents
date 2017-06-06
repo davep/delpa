@@ -1,6 +1,6 @@
 (1
  (cheat-sh .
-           [(1 2)
+           [(1 3)
             ((emacs
               (24)))
             "Interact with cheat.sh" single
