@@ -1,4 +1,13 @@
 (1
+ (qrencode .
+           [(1 0)
+            ((emacs
+              (24)))
+            "QR code text with qrenco.de" single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/qrencode.el"))])
  (cheat-sh .
            [(1 3)
             ((emacs
