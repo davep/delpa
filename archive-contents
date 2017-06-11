@@ -8,15 +8,6 @@
               ("Dave Pearson" . "davep@davep.org"))
              (:maintainer "Dave Pearson" . "davep@davep.org")
              (:url . "https://github.com/davep/qrencode.el"))])
- (cheat-sh .
-           [(1 3)
-            ((emacs
-              (24)))
-            "Interact with cheat.sh" single
-            ((:authors
-              ("Dave Pearson" . "davep@davep.org"))
-             (:maintainer "Dave Pearson" . "davep@davep.org")
-             (:url . "https://github.com/davep/cheat-sh.el"))])
  (expando .
           [(1 4)
            nil "Quickly expand macros for easy reading/checking" single
