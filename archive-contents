@@ -1,4 +1,13 @@
 (1
+ (dad-joke .
+           [(1 0)
+            ((emacs
+              (24)))
+            "Get/display dad jokes" single
+            ((:authors
+              ("Dave Pearson" . "davep@davep.org"))
+             (:maintainer "Dave Pearson" . "davep@davep.org")
+             (:url . "https://github.com/davep/dad-joke.el"))])
  (qrencode .
            [(1 0)
             ((emacs
