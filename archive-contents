@@ -1,6 +1,6 @@
 (1
  (dad-joke .
-           [(1 0)
+           [(1 1)
             ((emacs
               (24)))
             "Get/display dad jokes" single
