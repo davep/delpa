@@ -156,10 +156,8 @@
             (:maintainer "Dave Pearson" . "davep@davep.org")
             (:url . "https://github.com/davep/webinfo.el"))])
  (unbind .
-         [(1 4)
-          ((cl-lib
-            (0 5)))
-          "Commands for unbinding things" single
+         [(1 5)
+          nil "Commands for unbinding things" single
           ((:authors
             ("Dave Pearson" . "davep@davep.org"))
            (:maintainer "Dave Pearson" . "davep@davep.org")
