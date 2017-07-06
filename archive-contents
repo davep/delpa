@@ -1,4 +1,11 @@
 (1
+ (numbers .
+          [(1 0)
+           nil "Display information and trivia about numbers" single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:url . "https://github.com/davep/numbers.el"))])
  (qrencode .
            [(1 0)
             ((emacs
