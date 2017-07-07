@@ -7,7 +7,7 @@
             (:maintainer "Dave Pearson" . "davep@davep.org")
             (:url . "https://github.com/davep/graburl.el"))])
  (numbers .
-          [(1 2)
+          [(1 3)
            nil "Display information and trivia about numbers" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))
