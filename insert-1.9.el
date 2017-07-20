@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.8
+;; Version: 1.9
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/insert.el
 
@@ -166,7 +166,7 @@ line is inserted and `point' is returned to where it was before
 the new line is inserted."
   (interactive "*")
   (unless (bolp)
-    (insert "\n"))
+    (setf (point) (line-beginning-position)))
   (insert (make-string fill-column (aref ";" 0)) "\n;; ")
   (unless (eolp)
     (save-excursion
