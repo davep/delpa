@@ -1,15 +1,4 @@
 (1
- (eg .
-     [(1 0)
-      ((cl-lib
-        (0 5))
-       (emacs
-        (24)))
-      "Norton Guide reader" single
-      ((:authors
-        ("Dave Pearson" . "davep@davep.org"))
-       (:maintainer "Dave Pearson" . "davep@davep.org")
-       (:url . "https://github.com/davep/eg.el"))])
  (graburl .
           [(1 0)
            nil "Tool to help me test url-retrieve-synchronously" single
