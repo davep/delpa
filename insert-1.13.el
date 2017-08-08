@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.12
+;; Version: 1.13
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/insert.el
 
@@ -242,7 +242,7 @@ and make it a link to the video on YouTube."
   (interactive "*")
   (save-excursion
     (let ((package (file-name-nondirectory (or (buffer-file-name) "{{unknown.el}}")))
-          (feature (file-name-sans-extension (or (buffer-file-name) "unknown.el"))))
+          (feature (file-name-sans-extension (file-name-nondirectory (or (buffer-file-name) "unknown.el")))))
       (setf (point) (point-max))
       (insert "
 (provide '" feature ")
