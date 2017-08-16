@@ -1,4 +1,15 @@
 (1
+ (quiz .
+       [(1 0)
+        ((cl-lib
+          (0 5))
+         (emacs
+          (25)))
+        "Multiple choice quiz game" single
+        ((:authors
+          ("Dave Pearson" . "davep@davep.org"))
+         (:maintainer "Dave Pearson" . "davep@davep.org")
+         (:url . "https://github.com/davep/quiz.el"))])
  (graburl .
           [(1 0)
            nil "Tool to help me test url-retrieve-synchronously" single
