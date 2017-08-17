@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.0
+;; Version: 1.2
 ;; Keywords: games, trivia, quiz
 ;; URL: https://github.com/davep/quiz.el
 ;; Package-Requires: ((cl-lib "0.5") (emacs "25"))
@@ -202,36 +202,20 @@ Questions will be at most as hard as DIFFICULTY."
                           0))
            (length quiz-questions)))
 
-(defun quiz-quit ()
-  "Quit the current quiz."
-  (interactive)
-  (kill-buffer))
-
-(defvar quiz-mode-map nil
-  "Local keymap for `quiz'.")
-
-(unless quiz-mode-map
+(defvar quiz-mode-map
   (let ((map widget-keymap))
     (suppress-keymap map t)
-    (define-key map " "   #'quiz-check-answers)
-    (define-key map "q"   #'quiz-quit)
-    (define-key map "?"   #'describe-mode)
-    (setq quiz-mode-map map)))
+    (define-key map " " #'quiz-check-answers)
+    map)
+  "Local keymap for `quiz'.")
 
-(put 'quiz-mode 'mode-class 'special)
-
-(defun quiz-mode ()
+(define-derived-mode quiz-mode special-mode "Quiz"
   "Major mode for playing `quiz'.
 
 The key bindings for `quiz-mode' are:
 
 \\{quiz-mode-map}"
-  (kill-all-local-variables)
-  (use-local-map quiz-mode-map)
-  (setq major-mode       'quiz-mode
-        mode-name        "Quiz mode"
-        buffer-read-only t
-        truncate-lines   nil)
+  (setq truncate-lines nil)
   (buffer-disable-undo))
 
 (defvar-local quiz-questions nil
@@ -247,7 +231,7 @@ Questions will be at most as hard as DIFFICULTY."
   (interactive
    (list
     (read-number "Questions: " 10)
-    (completing-read "Category: (default any)" (quiz-get-category-names) nil t)
+    (completing-read "Category (default any): " (quiz-get-category-names) nil t)
     (completing-read
      (format "Difficulty (default %s): " (car quiz-difficulty-levels))
      quiz-difficulty-levels nil t nil nil (car quiz-difficulty-levels))))
