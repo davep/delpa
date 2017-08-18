@@ -2,7 +2,7 @@
 ;; Copyright 2017 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.2
+;; Version: 1.4
 ;; Keywords: games, trivia, quiz
 ;; URL: https://github.com/davep/quiz.el
 ;; Package-Requires: ((cl-lib "0.5") (emacs "25"))
@@ -83,10 +83,10 @@ Never access this directly, always call `quiz-get-categories' instead.")
 
 (defun quiz-lispify-categories (json-categories)
   "Turn JSON-CATEGORIES into a list."
-  (let ((categories (make-hash-table :test #'equal)))
-    (cl-loop for cat across (alist-get 'trivia_categories (json-read-from-string json-categories))
-             do (puthash (alist-get 'name cat) (alist-get 'id cat) categories)
-             finally return categories)))
+  (cl-loop with categories = (make-hash-table :test #'equal)
+           for cat across (alist-get 'trivia_categories (json-read-from-string json-categories))
+           do (puthash (alist-get 'name cat) (alist-get 'id cat) categories)
+           finally return categories))
 
 (defun quiz-get-categories ()
   "Return the list of quiz categories."
@@ -95,9 +95,9 @@ Never access this directly, always call `quiz-get-categories' instead.")
 
 (defun quiz-get-category-names ()
   "Return a list of category names."
-  (sort
-   (cl-loop for cat being the hash-key of (quiz-get-categories) collect cat)
-   #'string<))
+  (cl-loop for cat being the hash-key of (quiz-get-categories)
+           collect cat into categories
+           finally return (sort categories #'string<)))
 
 (defun quiz-lispify-questions (json-questions)
   "Turn JSON-QUESTIONS into a list."
@@ -151,13 +151,13 @@ DIFFICULTY can be used top optionally set the difficulty of the questions."
            :notify (lambda (widget &rest _)
                      (setf (alist-get 'given_answer (aref questions i))
                            (base64-encode-string (widget-value widget))))
-           (cl-loop for answer in
-                    (sort
-                     (append (list (quiz-decode (alist-get 'correct_answer q)))
-                             (cl-loop for wrong across (alist-get 'incorrect_answers q)
-                                      collect (quiz-decode wrong)))
-                     #'string<)
-                    collect (list 'item answer)))))
+           (mapcar (lambda (answer)
+                     (list 'item answer))
+                   (sort
+                    (mapcar #'quiz-decode
+                            (append (alist-get 'incorrect_answers q)
+                                    (list (alist-get 'correct_answer q))))
+                    #'string<)))))
 
 (defun quiz-insert-question (questions i)
   "From QUESTIONS insert QUESTION I."
@@ -195,19 +195,32 @@ Questions will be at most as hard as DIFFICULTY."
   (interactive)
   (message "%d out of %d questions answered correctly."
            (cl-loop for q across quiz-questions
-                    sum (if (string=
-                             (alist-get 'correct_answer q)
-                             (alist-get 'given_answer q ""))
-                            1
-                          0))
+                    if (string=
+                        (alist-get 'correct_answer q)
+                        (alist-get 'given_answer q ""))
+                    sum 1)
            (length quiz-questions)))
+
+(defun quiz-reload ()
+  "Load a new quiz with the current settings."
+  (interactive)
+  (quiz (length quiz-questions) quiz-category quiz-difficulty))
 
 (defvar quiz-mode-map
   (let ((map widget-keymap))
     (suppress-keymap map t)
     (define-key map " " #'quiz-check-answers)
+    (define-key map "r" #'quiz-reload)
     map)
   "Local keymap for `quiz'.")
+
+(defun quiz-mode-header-line ()
+  "Return the header line for a `quiz-mode' buffer."
+  '(:eval
+    (format " Quiz | Questions: %d | Category: %s | Difficulty: %s"
+            (length quiz-questions)
+            (if (string-empty-p quiz-category) "Any" quiz-category)
+            (capitalize quiz-difficulty))))
 
 (define-derived-mode quiz-mode special-mode "Quiz"
   "Major mode for playing `quiz'.
@@ -215,11 +228,18 @@ Questions will be at most as hard as DIFFICULTY."
 The key bindings for `quiz-mode' are:
 
 \\{quiz-mode-map}"
-  (setq truncate-lines nil)
+  (setq truncate-lines     nil
+        header-line-format (quiz-mode-header-line))
   (buffer-disable-undo))
 
 (defvar-local quiz-questions nil
   "Holds the questions for the current quiz.")
+
+(defvar-local quiz-category nil
+  "Holds the category for the current set of questions.")
+
+(defvar-local quiz-difficulty nil
+  "Holds the difficulty for the current set of questions.")
 
 ;;;###autoload
 (defun quiz (count category difficulty)
@@ -242,6 +262,8 @@ Questions will be at most as hard as DIFFICULTY."
     (let ((buffer (get-buffer-create quiz-buffer-name)))
       (with-current-buffer buffer
         (quiz-mode)
+        (setq quiz-category   category
+              quiz-difficulty difficulty)
         (let ((buffer-read-only nil))
           (setf (buffer-string) "")
           (save-excursion
