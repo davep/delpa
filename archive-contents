@@ -1,4 +1,13 @@
 (1
+ (macinfo .
+          [(0 1)
+           ((cl-lib
+             (0 5)))
+           "Show information from a Mac's serial number" single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:url . "https://github.com/davep/macinfo.el"))])
  (quiz .
        [(1 4)
         ((cl-lib
