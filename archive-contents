@@ -73,9 +73,9 @@
            (:maintainer "Dave Pearson" . "davep@davep.org")
            (:url . "https://github.com/davep/macdob.el"))])
  (nuke-buffers .
-               [(1 3)
-                ((dash
-                  (2 12)))
+               [(1 4)
+                ((emacs
+                  (25 1)))
                 "Safely kill as many buffers as possible" single
                 ((:authors
                   ("Dave Pearson" . "davep@davep.org"))
