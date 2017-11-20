@@ -86,7 +86,7 @@ system:
 
 I know this is a bit of a quick romp through the very basic facts, but
 hopefully there's enough here to point you in the right direction. See also
-my blog post I mention at the state of this document for how I went about
+my blog post I mention at the start of this document for how I went about
 then managing, loading and installing my own and other packages. You might
 also want to have a look at my
 own [`~/.emacs.d/`](https://github.com/davep/.emacs.d) to see how it all
