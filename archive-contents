@@ -1,6 +1,6 @@
 (1
  (rate-sx .
-          [(1 0)
+          [(1 1)
            nil "Show currency rates from rate.sx" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))
