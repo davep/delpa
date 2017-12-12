@@ -1,7 +1,9 @@
 (1
  (rate-sx .
-          [(1 2)
-           nil "Show currency rates from rate.sx" single
+          [(1 3)
+           ((emacs
+             (24 4)))
+           "Show currency rates from rate.sx" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))
             (:maintainer "Dave Pearson" . "davep@davep.org")
