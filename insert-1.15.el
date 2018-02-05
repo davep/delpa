@@ -1,8 +1,8 @@
 ;;; insert.el --- Insert stuff.
-;; Copyright 2017 by Dave Pearson <davep@davep.org>
+;; Copyright 2017-2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.14
+;; Version: 1.15
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/insert.el
 
@@ -255,6 +255,28 @@ and make it a link to the video on YouTube."
   (interactive "*")
   (insert-elisp-header)
   (insert-elisp-footer))
+
+;;;###autoload
+(defun insert-default-html5 ()
+  "Insert a minimal boilerplate HTML5 page."
+  (interactive "*")
+  (save-excursion
+    (insert "<!doctype html>
+<html lang=\"en\">
+  <head>
+    <title></title>
+    <meta charset=\"utf-8\">
+    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+    <link rel=\"shortcut icon\" href=\"/favicon.ico\" />
+    <link rel=\"apple-touch-icon\" href=\"/icon.png\" />
+  </head>
+
+  <body>
+  </body>
+
+</html>
+")))
 
 (provide 'insert)
 
