@@ -1,4 +1,13 @@
 (1
+ (fasta .
+        [(0 1)
+         ((emacs
+           (24)))
+         "Mode for working with fasta files" single
+         ((:authors
+           ("Dave Pearson" . "davep@davep.org"))
+          (:maintainer "Dave Pearson" . "davep@davep.org")
+          (:url . "https://github.com/davep/fasta.el"))])
  (festival .
            [(1 7)
             nil "Emacs interface into festival." single
