@@ -1,4 +1,11 @@
 (1
+ (highlight-chars .
+                  [(0)
+                   nil "Highlight specified sets of characters, including whitespace." single
+                   ((:authors
+                     ("Drew Adams"))
+                    (:maintainer nil . "Drew Adams (concat \"drew.adams\" \"@\" \"oracle\" \".com\")")
+                    (:url . "https://www.emacswiki.org/emacs/download/highlight-chars.el"))])
  (festival .
            [(1 7)
             nil "Emacs interface into festival." single
