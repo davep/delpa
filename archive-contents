@@ -1,4 +1,13 @@
 (1
+ (commoji .
+          [(1 0)
+           ((emacs
+             (24)))
+           "Quickly insert a commit emoji" single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:url . "https://github.com/davep/commoji.el"))])
  (highlight-chars .
                   [(0)
                    nil "Highlight specified sets of characters, including whitespace." single
