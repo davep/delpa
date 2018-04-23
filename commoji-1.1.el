@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.00
+;; Version: 1.01
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/commoji.el
 ;; Package-Requires: ((emacs "24"))
@@ -57,13 +57,14 @@
     ("Fixing on MacOS"            . apple)
     ("Fixing on Linux"            . penguin)
     ("Fixing on Windows"          . checkered_flag)
-    ("Work in progress"           . construction:)
+    ("Work in progress"           . construction)
     ("Adding CI build system"     . construction_worker)
     ("Analytics or tracking code" . chart_with_upwards_trend)
     ("Removing a dependency"      . heavy_minus_sign)
     ("Adding a dependency"        . heavy_plus_sign)
     ("Docker"                     . whale)
     ("Configuration files"        . wrench)
+    ("Build system"               . wrench)
     ("Merging branches"           . twisted_rightwards_arrows)
     ("Bad code / need improv."    . hankey)
     ("Reverting changes"          . rewind)

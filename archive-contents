@@ -1,6 +1,6 @@
 (1
  (commoji .
-          [(1 0)
+          [(1 1)
            ((emacs
              (24)))
            "Quickly insert a commit emoji" single
