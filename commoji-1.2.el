@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.01
+;; Version: 1.2
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/commoji.el
 ;; Package-Requires: ((emacs "24"))
@@ -43,6 +43,7 @@
     ("Adding a test"              . white_check_mark)
     ("General update"             . zap)
     ("Improve format/structure"   . art)
+    ("Code tidying"               . art)
     ("Refactor code"              . hammer)
     ("Removing code/files"        . fire)
     ("Continuous Integration"     . green_heart)
