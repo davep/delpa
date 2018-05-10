@@ -1,4 +1,13 @@
 (1
+ (requote .
+          [(1 0)
+           ((emacs
+             (24)))
+           "Toggle quotes around a string." single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:url . "https://github.com/davep/requote.el"))])
  (commoji .
           [(1 2)
            ((emacs
