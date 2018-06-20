@@ -2,7 +2,7 @@
 ;; Copyright 2017-2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.15
+;; Version: 1.16
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/insert.el
 
@@ -215,6 +215,7 @@ and make it a link to the video on YouTube."
 ;; Version: 0.01
 ;; Keywords: {{keywords}}
 ;; URL: https://github.com/davep/" package "
+;; Package-Requires: ((emacs \"24\"))
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the
@@ -250,6 +251,7 @@ and make it a link to the video on YouTube."
 ;;; " package " ends here
 "))))
 
+;;;###autoload
 (defun insert-default-elisp ()
   "Insert a standard elisp header and footer."
   (interactive "*")

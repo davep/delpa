@@ -256,7 +256,7 @@
          (:maintainer "Dave Pearson" . "davep@davep.org")
          (:url . "https://github.com/davep/itch.el"))])
  (insert .
-         [(1 15)
+         [(1 16)
           nil "Insert stuff." single
           ((:authors
             ("Dave Pearson" . "davep@davep.org"))
