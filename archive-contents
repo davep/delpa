@@ -1,4 +1,13 @@
 (1
+ (end-it .
+         [(1 0)
+          ((emacs
+            (24)))
+          "Add an \"ends here\" marker to a file" single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/end-it.el"))])
  (requote .
           [(1 0)
            ((emacs
