@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.0
+;; Version: 1.1
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(defun end-it-format ()
+(defun end-it--format ()
   "Return the correct end-it format for the current buffer."
   (cond ((derived-mode-p 'lisp-mode 'emacs-lisp-mode)
          ";;; %s")
@@ -45,6 +45,13 @@
         (t
          "%s")))
 
+(defun end-it--previous-line-empty-p ()
+  "Is the line before this one empty?"
+  (save-excursion
+    (beginning-of-line)
+    (forward-line -1)
+    (eolp)))
+
 ;;;###autoload
 (defun end-it ()
   "Add a end-of-file marker to the current buffer.
@@ -55,9 +62,11 @@ able to see that the addition worked okay and makes sense)."
   (interactive "*")
   (if (buffer-file-name)
       (let ((file (file-name-nondirectory (buffer-file-name)))
-            (format (end-it-format)))
+            (format (end-it--format)))
         (setf (point) (point-max))
         (unless (bolp)
+          (insert "\n"))
+        (unless (end-it--previous-line-empty-p)
           (insert "\n"))
         (insert (format format (format "%s %s" file "ends here")))
         (insert "\n"))
