@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.1
+;; Version: 1.2
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -30,13 +30,15 @@
 ;;; Code:
 
 (defun end-it--format ()
-  "Return the correct end-it format for the current buffer."
+  "Return the correct `end-it' format for the current buffer."
   (cond ((derived-mode-p 'lisp-mode 'emacs-lisp-mode)
          ";;; %s")
         ((derived-mode-p 'python-mode 'ruby-mode 'makefile-gmake-mode 'sh-mode)
          "### %s")
         ((derived-mode-p 'c-mode 'css-mode 'js-mode)
          "/* %s */")
+        ((derived-mode-p 'markdown-mode)
+         "[//]: # (%s)")
         ((derived-mode-p 'web-mode)
          (cond ((string= (symbol-value 'web-mode-engine) "django")
                 "{# %s #}")
@@ -70,7 +72,7 @@ able to see that the addition worked okay and makes sense)."
           (insert "\n"))
         (insert (format format (format "%s %s" file "ends here")))
         (insert "\n"))
-    (error "It only makes sense to end-it in buffers that are related to a file.")))
+    (error "It only makes sense to end-it in buffers that are related to a file")))
 
 (provide 'end-it)
 
