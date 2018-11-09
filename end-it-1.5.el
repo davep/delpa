@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.4
+;; Version: 1.5
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -34,7 +34,7 @@
   (cond ((derived-mode-p 'lisp-mode 'emacs-lisp-mode)
          ";;; %s")
         ((derived-mode-p 'python-mode 'ruby-mode 'makefile-gmake-mode
-                         'sh-mode 'restclient-mode 'conf-mode)
+                         'sh-mode 'restclient-mode 'conf-mode 'yaml-mode)
          "### %s")
         ((derived-mode-p 'c-mode 'css-mode 'js-mode)
          "/* %s */")

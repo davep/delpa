@@ -1,6 +1,6 @@
 (1
  (end-it .
-         [(1 4)
+         [(1 5)
           ((emacs
             (24)))
           "Add an \"ends here\" marker to a file" single
