@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.5
+;; Version: 1.6
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -38,6 +38,8 @@
          "### %s")
         ((derived-mode-p 'c-mode 'css-mode 'js-mode)
          "/* %s */")
+        ((derived-mode-p 'rust-mode)
+         "// %s")
         ((derived-mode-p 'markdown-mode)
          "[//]: # (%s)")
         ((derived-mode-p 'web-mode)
