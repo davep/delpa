@@ -1,4 +1,13 @@
 (1
+ (make-phony .
+             [(1 0)
+              ((emacs
+                (24)))
+              "Make a Makefile target PHONY" single
+              ((:authors
+                ("Dave Pearson" . "davep@davep.org"))
+               (:maintainer "Dave Pearson" . "davep@davep.org")
+               (:url . "https://github.com/davep/make-phony.el"))])
  (end-it .
          [(1 6)
           ((emacs
