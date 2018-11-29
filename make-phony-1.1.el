@@ -2,7 +2,7 @@
 ;; Copyright 2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.00
+;; Version: 1.1
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/make-phony.el
 ;; Package-Requires: ((emacs "24"))
@@ -23,7 +23,7 @@
 ;;; Commentary:
 ;;
 ;; make-phony.el provides a simple command that can be used to make a target
-;; a GNU Makefile into a PHONY target.
+;; a Makefile into a PHONY target.
 
 ;;; Code:
 
@@ -31,15 +31,15 @@
 (defun make-phony ()
   "Make the current Makefile target PHONY."
   (interactive)
-  (if (derived-mode-p 'makefile-gmake-mode)
+  (if (derived-mode-p 'makefile-gmake-mode 'makefile-bsdmake-mode)
       (save-excursion
         (setf (point) (point-at-bol))
         (if (looking-at "^\\([[:alnum:]]+\\):")
             (let ((phony (match-string 1)))
               (insert (format ".PHONY: %s" phony))
               (newline))
-          (error "Can't see a target that should be phony")))
-    (error "This function is only designed for GNU Makefiles")))
+          (error "Can't see a target that should be .PHONY")))
+    (error "This function is only designed for Makefiles")))
 
 (provide 'make-phony)
 
