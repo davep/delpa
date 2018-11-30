@@ -1,4 +1,15 @@
 (1
+ (wordcloud .
+            [(1 1)
+             ((cl-lib
+               (0 5))
+              (emacs
+               (24 3)))
+             "Generate a word cloud" single
+             ((:authors
+               ("Dave Pearson" . "davep@davep.org"))
+              (:maintainer "Dave Pearson" . "davep@davep.org")
+              (:url . "https://github.com/davep/wordcloud.el"))])
  (make-phony .
              [(1 1)
               ((emacs
