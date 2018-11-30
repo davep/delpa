@@ -2,7 +2,7 @@
 ;; Copyright 2017-2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.1
+;; Version: 1.2
 ;; Keywords: games
 ;; URL: https://github.com/davep/wordcloud.el
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24.3"))
@@ -151,7 +151,7 @@ range."
   (let* ((counts (mapcar #'cdr words))
          (min    (apply #'min counts))
          (max    (apply #'max counts))
-         (dist   (- max min)))
+         (dist   (* 1.0 (- max min))))
     (mapcar (lambda (word)
               (cons
                (car word)
@@ -159,7 +159,7 @@ range."
                 (cdr word)
                 (if (zerop dist)
                     (/ wordcloud-length 2)
-                  (* (/ (1- wordcloud-length) dist) (- (cdr word) min))))))
+                  (truncate (* (/ (1- wordcloud-length) dist) (- (cdr word) min)))))))
             words)))
 
 (defun wordcloud (by-frequency)
