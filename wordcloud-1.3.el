@@ -2,7 +2,7 @@
 ;; Copyright 2017-2018 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.2
+;; Version: 1.3
 ;; Keywords: games
 ;; URL: https://github.com/davep/wordcloud.el
 ;; Package-Requires: ((cl-lib "0.5") (emacs "24.3"))
@@ -22,7 +22,7 @@
 
 ;;; Commentary:
 ;;
-;; wordcloud.el generates a simple word cloud in a buffer.
+;; wordcloud.el generates a simple text word cloud of a buffer's content.
 
 ;;; Code:
 
@@ -103,7 +103,11 @@ biggest)."
   :group 'wordcloud)
 
 (defconst wordcloud-length 10
-  "The length of the word cloud")
+  "The length of the word cloud.
+
+This is the number of word sizes that are used in the cloud. Note
+that changing this will require that you add more
+`wordcloud-length-N' faces.")
 
 (defcustom wordcloud-min-word-length 4
   "Minimum length of a word to include in the cloud."
@@ -162,8 +166,12 @@ range."
                   (truncate (* (/ (1- wordcloud-length) dist) (- (cdr word) min)))))))
             words)))
 
+;;;###autoload
 (defun wordcloud (by-frequency)
-  "Show a word cloud for the current buffer."
+  "Show a word cloud for the current buffer.
+
+If BY-FREQUENCY is non-nil the cloud is shown sorted by
+frequency, otherwise it's shown in alphabetical order."
   (interactive "P")
   (let ((words (if by-frequency
                    (wordcloud-get-word-frequency-list-descending)
