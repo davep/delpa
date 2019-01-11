@@ -29,7 +29,7 @@
            (:maintainer "Dave Pearson" . "davep@davep.org")
            (:url . "https://github.com/davep/end-it.el"))])
  (requote .
-          [(1 0)
+          [(1 1)
            ((emacs
              (24)))
            "Toggle quotes around a string." single

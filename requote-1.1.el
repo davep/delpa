@@ -1,8 +1,8 @@
 ;;; requote.el --- Toggle quotes around a string. -*- lexical-binding: t -*-
-;; Copyright 2018 by Dave Pearson <davep@davep.org>
+;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.0
+;; Version: 1.1
 ;; Keywords: convenience, string, quotes
 ;; URL: https://github.com/davep/requote.el
 ;; Package-Requires: ((emacs "24"))
@@ -43,7 +43,7 @@ style of quote to another."
   (interactive "*r")
   (if (and start end (= (char-after start) (char-after (1- end))))
       (let ((char (string (char-after start))))
-        (cond ((string= char "\"")
+        (cond ((or (string= char "\"") (string= char "`"))
                (requote-set-char start end "'"))
               ((string= char "'")
                (requote-set-char start end "\""))
