@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.00
+;; Version: 1.1
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/funhead.el
 ;; Package-Requires: ((emacs "24"))
@@ -33,7 +33,7 @@
   (cond ((derived-mode-p 'python-mode 'sh-mode)
          (lambda ()
            (insert (concat (make-string 78 ?#) "\n# "))))
-        ((derived-mode-p 'js-mode)
+        ((derived-mode-p 'js-mode 'css-mode)
          (lambda ()
            (insert "/**\n * \n */")
            (next-line -1)))))
