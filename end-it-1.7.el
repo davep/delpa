@@ -1,8 +1,8 @@
 ;;; end-it.el --- Add an "ends here" marker to a file -*- lexical-binding: t -*-
-;; Copyright 2018 by Dave Pearson <davep@davep.org>
+;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.6
+;; Version: 1.7
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -34,7 +34,8 @@
   (cond ((derived-mode-p 'lisp-mode 'emacs-lisp-mode)
          ";;; %s")
         ((derived-mode-p 'python-mode 'ruby-mode 'makefile-gmake-mode
-                         'sh-mode 'restclient-mode 'conf-mode 'yaml-mode)
+                         'sh-mode 'restclient-mode 'conf-mode 'yaml-mode
+                         'dockerfile-mode)
          "### %s")
         ((derived-mode-p 'c-mode 'css-mode 'js-mode)
          "/* %s */")
