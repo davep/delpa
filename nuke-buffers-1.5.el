@@ -1,8 +1,8 @@
 ;;; nuke-buffers.el --- Safely kill as many buffers as possible
-;; Copyright 2017 by Dave Pearson <davep@davep.org>
+;; Copyright 2017-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.4
+;; Version: 1.5
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/nuke-buffers.el
 ;; Package-Requires: ((emacs "25.1"))
@@ -72,6 +72,32 @@
                  (not (eq buffer (current-buffer)))))
               (buffer-list)))
 
+(defun nuke-buffers-get-candidates-from (directory)
+  "Get a list of buffers that can be nuked below DIRECTORY.
+
+This function looks for buffers that are visiting files, and only
+files which have been saved. At the moment it *doesn't* return a
+buffers visiting an actual directory (so it doesn't return dired
+buffers). I'd like to change this at some point."
+  (let* ((directory (file-truename directory))
+         (directory-len (length directory)))
+    (seq-filter (lambda (buffer)
+                  (let* ((file (buffer-file-name buffer))
+                         (file-len (length file)))
+                    (and
+                     ;; If it's a buffer that's associated with a file...
+                     file
+                     ;; ...and if it relates to a saved file...
+                     (not (nuke-buffers-unsaved-file-buffer-p buffer))
+                     ;; ...and if it's within the given directory...
+                     (string=
+                      directory
+                      (substring
+                       (file-truename file)
+                       0
+                       (min file-len directory-len))))))
+                (buffer-list))))
+
 ;;;###autoload
 (defun nuke-buffers ()
   "Kill as many buffers as possible, without losing important things."
@@ -79,6 +105,18 @@
   (message "Nuked %d buffer(s)."
            (length
             (mapc #'kill-buffer (nuke-buffers-get-candidates)))))
+
+;;;###autoload
+(defun nuke-buffers-from-directory (directory)
+  "Nuke all buffers relating to files in DIRECTORY.
+
+Note that `nuke-buffers-ignore' is itself ignored here. Unsaved
+buffers are, however, bypassed."
+  (interactive "DNuke all within: ")
+  (message "Nuked %d buffer(s) related to %s."
+           (length
+            (mapc #'kill-buffer (nuke-buffers-get-candidates-from directory)))
+           directory))
 
 (provide 'nuke-buffers)
 
