@@ -2,7 +2,7 @@
 ;; Copyright 2017-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.5
+;; Version: 1.6
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/nuke-buffers.el
 ;; Package-Requires: ((emacs "25.1"))
@@ -31,6 +31,7 @@
 ;;; Code:
 
 (require 'seq)
+(require 'dired)
 
 (defgroup nuke-buffers nil
   "Safely kill as many buffers as possible."
@@ -72,6 +73,18 @@
                  (not (eq buffer (current-buffer)))))
               (buffer-list)))
 
+(defun nuke-buffers-get-buffer-directory (buffer)
+  "Attempt to get the directory that BUFFER is visiting."
+  (let ((buffer-dir
+         (or
+          ;; Is it a buffer that's visiting a file?
+          (when (buffer-file-name buffer)
+            (file-name-directory (buffer-file-name buffer)))
+          ;; If not, perhaps it's a dired buffer?
+          (with-current-buffer buffer dired-directory))))
+    (when buffer-dir
+      (file-truename buffer-dir))))
+
 (defun nuke-buffers-get-candidates-from (directory)
   "Get a list of buffers that can be nuked below DIRECTORY.
 
@@ -81,22 +94,19 @@ buffers visiting an actual directory (so it doesn't return dired
 buffers). I'd like to change this at some point."
   (let* ((directory (file-truename directory))
          (directory-len (length directory)))
-    (seq-filter (lambda (buffer)
-                  (let* ((file (buffer-file-name buffer))
-                         (file-len (length file)))
-                    (and
-                     ;; If it's a buffer that's associated with a file...
-                     file
-                     ;; ...and if it relates to a saved file...
-                     (not (nuke-buffers-unsaved-file-buffer-p buffer))
-                     ;; ...and if it's within the given directory...
-                     (string=
-                      directory
-                      (substring
-                       (file-truename file)
-                       0
-                       (min file-len directory-len))))))
-                (buffer-list))))
+    (seq-filter
+     (lambda (buffer)
+       (let* ((buffer-dir (nuke-buffers-get-buffer-directory buffer))
+              (buffer-dir-len (length buffer-dir)))
+         (when buffer-dir
+           (and
+            ;; ...and if it relates to a saved file...
+            (not (nuke-buffers-unsaved-file-buffer-p buffer))
+            ;; ...and if it's within the given directory...
+            (string=
+             directory
+             (substring buffer-dir 0 (min buffer-dir-len directory-len)))))))
+     (buffer-list))))
 
 ;;;###autoload
 (defun nuke-buffers ()
