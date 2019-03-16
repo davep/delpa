@@ -1,8 +1,8 @@
 ;;; fasta.el --- Mode for working with fasta files -*- lexical-binding: t -*-
-;; Copyright 2018 by Dave Pearson <davep@davep.org>
+;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.01
+;; Version: 1.0
 ;; Keywords: files, dna, fasta, bioinformatics
 ;; URL: https://github.com/davep/fasta.el
 ;; Package-Requires: ((emacs "24"))
@@ -43,62 +43,74 @@
   :group 'fasta)
 
 (defface fasta-adenine-face
-  '((t :foreground "#5050ff"))
+  '((((background dark)) :foreground "#8dd4e8")
+    (t :foreground "#4b5cc4"))
   "Face to use when showing adenine."
   :group 'fasta)
 
 (defface fasta-cytosine-face
-  '((t :foreground "#e00000"))
+  '((((background dark)) :foreground "#ff0000")
+    (t :foreground "#bb0000"))
   "Face to use when showing cytosine."
   :group 'fasta)
 
 (defface fasta-guanine-face
-  '((t :foreground "#00c000"))
+  '((((background dark)) :foreground "#00c000")
+    (t :foreground "#00c000"))
   "Face to use when showing guanine."
   :group 'fasta)
 
 (defface fasta-thymine-face
-  '((t :foreground "#969600"))
+  '((((background dark)) :foreground "#bbbb00")
+    (t :foreground "#969600"))
   "Face to use when showing thymine."
   :group 'fasta)
 
 (defface fasta-uracil-face
-  '((t :foreground "#cc9900"))
+  '((((background dark)) :foreground "#cc9900")
+    (t :foreground "#cc9900"))
   "Face to use when showing uracil."
   :group 'fasta)
 
 (defface fasta-purine-face
-  '((t :foreground "#2e8b57"))
+  '((((background dark)) :foreground "#2e8b57")
+    (t :foreground "#2e8b57"))
   "Face to use when showing a purine."
   :group 'fasta)
 
 (defface fasta-pyrimidine-face
-  '((t :foreground "#ff8c00"))
+  '((((background dark)) :foreground "#ff8c00")
+    (t :foreground "#ff8c00"))
   "Face to use when showing a pyrimidine."
   :group 'fasta)
 
 (defface fasta-ketone-face
-  '((t :inherit default))
+  '((((background dark)) :foreground "#bbc000")
+    (t :foreground "#96c000"))
   "Face to use when showing a ketone."
   :group 'fasta)
 
 (defface fasta-amine-face
-  '((t :inherit default))
+  '((((background dark)) :foreground "#ff5cc4")
+    (t :foreground "#bb5cc4"))
   "Face to use when showing an amine."
   :group 'fasta)
 
 (defface fasta-strong-face
-  '((t :inherit default))
+  '((((background dark)) :foreground "#ffc000")
+    (t :foreground "#bbc000"))
   "Face to use when showing strong interaction."
   :group 'fasta)
 
 (defface fasta-weak-face
-  '((t :inherit default))
+  '((((background dark)) :foreground "#8dbb00")
+    (t :foreground "#4b9500"))
   "Face to use when showing weak interaction."
   :group 'fasta)
 
 (defface fasta-not-adenine-face
-  '((t :foreground "white" :background "#5050ff"))
+  '((((background dark)) :foreground "black" :background "#8dd4e8")
+    (t :foreground "white" :background "#4b5cc4"))
   "Face to use when showing not adenine."
   :group 'fasta)
 
@@ -108,12 +120,14 @@
   :group 'fasta)
 
 (defface fasta-not-guanine-face
-  '((t :background "#00c000"))
+  '((((background dark)) :foreground "black" :background "#00c000")
+    (t :background "#00c000"))
   "Face to use when showing not guanine."
   :group 'fasta)
 
 (defface fasta-not-thymine-uracil-face
-  '((t :foreground "white" :background "#969600"))
+  '((((background dark)) :foreground "black" :background "#bbbb00")
+    (t :foreground "white" :background "#969600"))
   "Face to use when showing not thymine/uracil."
   :group 'fasta)
 
@@ -135,23 +149,24 @@
 (defvar fasta-font-lock
   '(("^>.*$" . 'fasta-header-face)
     ("^;.*$" . 'fasta-comment-face)
-    ("[Aa]"  . 'fasta-adenine-face)
-    ("[Cc]"  . 'fasta-cytosine-face)
-    ("[Gg]"  . 'fasta-guanine-face)
-    ("[Tt]"  . 'fasta-thymine-face)
-    ("[Uu]"  . 'fasta-uracil-face)
-    ("[Rr]"  . 'fasta-purine-face)
-    ("[Yy]"  . 'fasta-pyrimidine-face)
-    ("[Kk]"  . 'fasta-ketone-face)
-    ("[Mm]"  . 'fasta-amine-face)
-    ("[Ss]"  . 'fasta-strong-face)
-    ("[Ww]"  . 'fasta-weak-face)
-    ("[Bb]"  . 'fasta-not-adenine-face)
-    ("[Dd]"  . 'fasta-not-cytosine-face)
-    ("[Hh]"  . 'fasta-not-guanine-face)
-    ("[Vv]"  . 'fasta-not-thymine-uracil-face)
-    ("[NN]"  . 'fasta-nucleic-acid-face)
+    ("A"     . 'fasta-adenine-face)
+    ("C"     . 'fasta-cytosine-face)
+    ("G"     . 'fasta-guanine-face)
+    ("T"     . 'fasta-thymine-face)
+    ("U"     . 'fasta-uracil-face)
+    ("R"     . 'fasta-purine-face)
+    ("Y"     . 'fasta-pyrimidine-face)
+    ("K"     . 'fasta-ketone-face)
+    ("M"     . 'fasta-amine-face)
+    ("S"     . 'fasta-strong-face)
+    ("W"     . 'fasta-weak-face)
+    ("B"     . 'fasta-not-adenine-face)
+    ("D"     . 'fasta-not-cytosine-face)
+    ("H"     . 'fasta-not-guanine-face)
+    ("V"     . 'fasta-not-thymine-uracil-face)
+    ("N"     . 'fasta-nucleic-acid-face)
     ("-"     . 'fasta-gap-face)
+    ("\\."   . 'fasta-gap-face)
     ("\\*"   . 'fasta-translation-stop-face))
   "Font lock rules for `fasta-mode'.")
 

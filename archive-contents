@@ -63,7 +63,7 @@
                     (:maintainer nil . "Drew Adams (concat \"drew.adams\" \"@\" \"oracle\" \".com\")")
                     (:url . "https://www.emacswiki.org/emacs/download/highlight-chars.el"))])
  (fasta .
-        [(0 1)
+        [(1 0)
          ((emacs
            (24)))
          "Mode for working with fasta files" single
