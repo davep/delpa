@@ -2,7 +2,7 @@
 ;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.4
+;; Version: 1.5
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/commoji.el
 ;; Package-Requires: ((emacs "24"))
@@ -102,7 +102,7 @@ COMMIT-TYPE is the description of the commit type to work off.
 Completions come from `commoji-emoji'."
   (interactive
    (list
-    (ido-completing-read "Commit type: " (mapcar #'car commoji-emoji) nil t)))
+    (completing-read "Commit type: " (mapcar #'car commoji-emoji) nil t)))
   (when commit-type
     (let ((emoji (assoc commit-type commoji-emoji)))
       (when emoji
