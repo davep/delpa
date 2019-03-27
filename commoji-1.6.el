@@ -2,7 +2,7 @@
 ;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.5
+;; Version: 1.6
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/commoji.el
 ;; Package-Requires: ((emacs "24"))
@@ -77,6 +77,7 @@
     ("Removing logs"              . mute)
     ("Responsive design"          . iphone)
     ("Reverting changes"          . rewind)
+    ("Screenshots"                . photo)
     ("Security"                   . lock)
     ("Test data"                  . clipboard)
     ("Tests"                      . rotating_light)

@@ -47,7 +47,7 @@
             (:maintainer "Dave Pearson" . "davep@davep.org")
             (:url . "https://github.com/davep/requote.el"))])
  (commoji .
-          [(1 5)
+          [(1 6)
            ((emacs
              (24)))
            "Quickly insert a commit emoji" single
