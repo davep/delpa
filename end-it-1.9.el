@@ -2,7 +2,7 @@
 ;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.8
+;; Version: 1.9
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -48,6 +48,8 @@
                 "{# %s #}")
                (t
                 "<!-- %s -->")))
+        ((derived-mode-p 'haskell-mode)
+         "-- %s")
         (t
          "%s")))
 
