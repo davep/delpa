@@ -1,6 +1,6 @@
 (1
  (funhead .
-          [(1 6)
+          [(1 7)
            ((emacs
              (24)))
            "Insert my standard function headers" single

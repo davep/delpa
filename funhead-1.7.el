@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.6
+;; Version: 1.7
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/funhead.el
 ;; Package-Requires: ((emacs "24"))
@@ -31,7 +31,7 @@
 (defun funhead--format ()
   "Return the correct `funhead' format for the current buffer."
   (cond ((derived-mode-p 'python-mode 'sh-mode 'makefile-gmake-mode
-                         'yaml-mode 'perl-mode 'julia-mode)
+                         'yaml-mode 'perl-mode 'julia-mode 'fish-mode)
          (lambda ()
            (insert (concat (make-string 78 ?#) "\n# "))))
         ((derived-mode-p 'emacs-lisp-mode 'lisp-mode)
