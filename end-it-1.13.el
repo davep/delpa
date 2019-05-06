@@ -2,7 +2,7 @@
 ;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.12
+;; Version: 1.13
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -36,7 +36,7 @@
         ((derived-mode-p 'python-mode 'ruby-mode 'makefile-gmake-mode
                          'makefile-bsdmake-mode 'sh-mode 'restclient-mode
                          'conf-mode 'yaml-mode 'dockerfile-mode 'perl-mode
-                         'gitconfig-mode 'julia-mode)
+                         'gitconfig-mode 'julia-mode 'fish-mode)
          "### %s")
         ((derived-mode-p 'c-mode 'css-mode 'js-mode)
          "/* %s */")
