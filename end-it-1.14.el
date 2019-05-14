@@ -2,7 +2,7 @@
 ;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.9
+;; Version: 1.14
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/end-it.el
 ;; Package-Requires: ((emacs "24"))
@@ -31,11 +31,12 @@
 
 (defun end-it--format ()
   "Return the correct `end-it' format for the current buffer."
-  (cond ((derived-mode-p 'lisp-mode 'emacs-lisp-mode)
+  (cond ((derived-mode-p 'lisp-mode 'emacs-lisp-mode 'clojure-mode)
          ";;; %s")
         ((derived-mode-p 'python-mode 'ruby-mode 'makefile-gmake-mode
                          'makefile-bsdmake-mode 'sh-mode 'restclient-mode
-                         'conf-mode 'yaml-mode 'dockerfile-mode)
+                         'conf-mode 'yaml-mode 'dockerfile-mode 'perl-mode
+                         'gitconfig-mode 'julia-mode 'fish-mode)
          "### %s")
         ((derived-mode-p 'c-mode 'css-mode 'js-mode)
          "/* %s */")
