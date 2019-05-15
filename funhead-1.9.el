@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.8
+;; Version: 1.9
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/funhead.el
 ;; Package-Requires: ((emacs "24"))
@@ -34,7 +34,7 @@
                          'yaml-mode 'perl-mode 'julia-mode 'fish-mode)
          (lambda ()
            (insert (concat (make-string 78 ?#) "\n# "))))
-        ((derived-mode-p 'emacs-lisp-mode 'lisp-mode 'clojure-mode)
+        ((derived-mode-p 'emacs-lisp-mode 'lisp-mode 'clojure-mode 'scheme-mode)
          (lambda ()
            (insert (concat (make-string 78 ?\;) "\n;; "))))
         ((derived-mode-p 'js-mode 'css-mode)
