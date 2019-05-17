@@ -29,7 +29,7 @@
                (:maintainer "Dave Pearson" . "davep@davep.org")
                (:url . "https://github.com/davep/make-phony.el"))])
  (end-it .
-         [(1 15)
+         [(1 16)
           ((emacs
             (24)))
           "Add an \"ends here\" marker to a file" single
