@@ -2,7 +2,7 @@
 ;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.6
+;; Version: 1.7
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/commoji.el
 ;; Package-Requires: ((emacs "24"))
@@ -57,6 +57,7 @@
     ("Documenting source code"    . bulb)
     ("Downgrading dependencies"   . arrow_down)
     ("Experimenting"              . alembic)
+    ("End of day saving"          . clock530)
     ("Fixing on Linux"            . penguin)
     ("Fixing on MacOS"            . apple)
     ("Fixing on Windows"          . checkered_flag)
@@ -64,6 +65,7 @@
     ("Improve format/structure"   . art)
     ("Initial commit"             . tada)
     ("Lint"                       . shirt)
+    ("Makefile changes"           . factory)
     ("Merging branches"           . twisted_rightwards_arrows)
     ("Metadata"                   . card_index)
     ("Mocking"                    . clown_face)
@@ -81,6 +83,7 @@
     ("Security"                   . lock)
     ("Test data"                  . clipboard)
     ("Tests"                      . rotating_light)
+    ("Testing on the servers"     . 8ball)
     ("Text"                       . pencil)
     ("Translation"                . alien)
     ("Upgrading dependencies"     . arrow_up)
