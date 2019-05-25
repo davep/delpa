@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
 ;; Package-Requires: ((emacs "25"))
@@ -49,8 +49,8 @@
   :group 'pinboard)
 
 (defcustom pinboard-time-format-function
-  (lambda (time)
-    (format-time-string "%Y-%m-%d %H:%M:%S" (parse-iso8601-time-string time)))
+  '(lambda (time)
+     (format-time-string "%Y-%m-%d %H:%M:%S" (parse-iso8601-time-string time)))
   "The function to use to format the time of a pin in the list."
   :type 'function
   :group 'pinboard)
@@ -197,14 +197,28 @@ FILTER."
                 (seq-filter (or filter #'identity) (pinboard-get-pins))))
   (tabulated-list-print t))
 
+(defmacro pinboard-with-current-pin (name &rest body)
+  "Evaluate BODY with the currently-selected pin as NAME."
+  (declare (indent 1))
+  (let ((pin-id (gensym)))
+    `(when-let ((,pin-id  (tabulated-list-get-id)))
+       (let ((,name (pinboard-find-pin ,pin-id)))
+         (if ,name
+             (progn ,@body)
+           (error "Could not find pin %s" (tabulated-list-get-id)))))))
+
 (defun pinboard-open ()
   "Open the currently-highlighted pin in a web browser."
   (interactive)
-  (when (tabulated-list-get-id)
-    (let ((pin (pinboard-find-pin (tabulated-list-get-id))))
-      (if pin
-          (browse-url (alist-get 'href pin))
-        (error "Could not find pin %s" (tabulated-list-get-id))))))
+  (pinboard-with-current-pin pin
+    (browse-url (alist-get 'href pin))))
+
+(defun pinboard-kill-url ()
+  "Add the current pin's URL to the `kill-ring'."
+  (interactive)
+  (pinboard-with-current-pin pin
+    (kill-new (alist-get 'href pin))
+    (message "URL copied to the kill ring")))
 
 (defun pinboard-caption (s)
   "Add properties to S to make it a caption for Pinboard output."
@@ -273,7 +287,12 @@ FILTER."
   (let ((tag (downcase tag)))
     (pinboard-redraw
      (lambda (pin)
-       (seq-contains (split-string (alist-get 'tags pin)) tag)))))
+       (seq-contains (split-string (downcase (alist-get 'tags pin))) tag)))))
+
+(defun pinboard-untagged ()
+  "Only show pints that have no tags."
+  (interactive)
+  (pinboard-redraw (lambda (pin) (zerop (length (alist-get 'tags pin ""))))))
 
 (defun pinboard-search (text)
   "Only show pins that contain TEXT somewhere.
@@ -301,12 +320,14 @@ The title, description and tags are all searched. Search is case-insensitive."
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map t)
     (define-key map "a"         #'pinboard-refresh)
+    (define-key map "k"         #'pinboard-kill-url)
     (define-key map "g"         #'pinboard-refresh)
     (define-key map "p"         #'pinboard-public)
     (define-key map "P"         #'pinboard-private)
     (define-key map "u"         #'pinboard-unread)
     (define-key map "r"         #'pinboard-read)
     (define-key map "t"         #'pinboard-tagged)
+    (define-key map "T"         #'pinboard-untagged)
     (define-key map "/"         #'pinboard-search)
     (define-key map " "         #'pinboard-view)
     (define-key map (kbd "RET") #'pinboard-open)
