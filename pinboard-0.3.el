@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.2
+;; Version: 0.3
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
 ;; Package-Requires: ((emacs "25"))
@@ -30,13 +30,17 @@
 (require 'json)
 (require 'subr-x)
 (require 'url-vars)
+(require 'widget)
+(require 'wid-edit)
 (require 'browse-url)
+(require 'url-util)
 (require 'parse-time)
 (require 'auth-source)
 
 (defgroup pinboard nil
   "Pinboard client for Emacs."
-  :group 'hypermedia)
+  :group 'hypermedia
+  :link '(url-link :tag "GitHub" "https://github.com/davep/pinboard.el"))
 
 (defcustom pinboard-private-symbol "-"
   "The character to use to show a pin is private."
@@ -92,13 +96,15 @@ REPOSITORY!")
   "When was CALLER last called?"
   (or (get caller :pinboard-last-called) 0))
 
-(defun pinboard-too-soon (caller rate)
+(defun pinboard-too-soon (caller &optional rate)
   "Are we hitting on Pinboard too soon?
 
-See if we're calling CALLER before RATE has expired."
+See if we're calling CALLER before RATE has expired. RATE is
+optional and defaults to 3 seconds (as per the pinboard API
+documentation.)"
   (let ((last (pinboard-last-called caller)))
     (when last
-      (<= (- (float-time) last) rate))))
+      (<= (- (float-time) last) (or rate 3)))))
 
 (defun pinboard-auth ()
   "Attempt to get the API token for Pinboard."
@@ -112,6 +118,16 @@ See if we're calling CALLER before RATE has expired."
 (defun pinboard-api-url (&rest params)
   "Build the API call from PARAMS."
   (format pinboard-api-url (string-join params "/") pinboard-api-token))
+
+(defun pinboard-with-params (url &rest params)
+  "Combine URL with PARAMS to make a new URL."
+  (format "%s&%s"
+          url
+          (string-join
+           (mapcar (lambda (param)
+                     (format "%s=%s" (car param) (url-hexify-string (cdr param))))
+                   params)
+           "&")))
 
 (defun pinboard-call (url caller)
   "Call on URL and return the data.
@@ -127,7 +143,7 @@ to help set rate limits."
 
 (defun pinboard-last-updated ()
   "Get when Pinboard was last updated."
-  (if (pinboard-too-soon :pinboard-last-updated 3)
+  (if (pinboard-too-soon :pinboard-last-updated)
       pinboard-last-updated
     (let ((result (alist-get 'update_time (pinboard-call (pinboard-api-url "posts" "update") :pinboard-last-updated))))
       (when result
@@ -136,7 +152,7 @@ to help set rate limits."
 (defun pinboard-get-tags ()
   "Get the list of tags used by the user."
   ;; If it's within the 3 second rule...
-  (if (pinboard-too-soon :pinboard-get-tags 3)
+  (if (pinboard-too-soon :pinboard-get-tags)
       ;; ...just go with what we've got.
       pinboard-tags
     ;; We're not calling on Pinboard too soon. So, next up, let's see if
@@ -171,11 +187,30 @@ to help set rate limits."
       ;; Looks like nothing has changed. Return what we've got.
       pinboard-pins)))
 
-(defun pinboard-find-pin (hash)
-  "Find and return the pin identified by HASH."
+(defun pinboard-delete-pin (href)
+  "Delete the pin for HREF."
+  ;; Get the API to delete it on the server.
+  (pinboard-call
+   (pinboard-with-params
+    (pinboard-api-url "posts" "delete")
+    (cons 'url href))
+   :pinboard-delete-pin)
+  ;; Filter out any versions held locally.
+  (when pinboard-pins
+    (setq pinboard-pins
+          (seq-remove (lambda (pin)
+                        (string= (alist-get 'href pin) href))
+                      pinboard-pins)))
+  ;; Let the user know we did it.
+  (message "Deleted \"%s\"." href))
+
+(defun pinboard-find-pin (via value)
+  "Find and return the pin identified by VIA.
+
+The pin is returned if VALUE matches."
   (seq-find
    (lambda (pin)
-     (string= (alist-get 'hash pin) hash))
+     (string= (alist-get via pin) value))
    (pinboard-get-pins)))
 
 (defun pinboard-redraw (&optional filter)
@@ -202,7 +237,7 @@ FILTER."
   (declare (indent 1))
   (let ((pin-id (gensym)))
     `(when-let ((,pin-id  (tabulated-list-get-id)))
-       (let ((,name (pinboard-find-pin ,pin-id)))
+       (let ((,name (pinboard-find-pin 'hash ,pin-id)))
          (if ,name
              (progn ,@body)
            (error "Could not find pin %s" (tabulated-list-get-id)))))))
@@ -227,39 +262,36 @@ FILTER."
 (defun pinboard-view ()
   "View the details of the currently-highlighted pin."
   (interactive)
-  (when (tabulated-list-get-id)
-    (let ((pin (pinboard-find-pin (tabulated-list-get-id))))
-      (unless pin
-        (error "Could not find pin %s" (tabulated-list-get-id)))
-      (with-help-window "*Pinboard pin*"
-        (with-current-buffer standard-output
-          (insert
-           (pinboard-caption "Title") "\n"
-           (alist-get 'description pin) "\n\n"
-           (pinboard-caption "URL") "\n")
-          (help-insert-xref-button
-           (alist-get 'href pin)
-           'help-url
-           (alist-get 'href pin))
-          (let ((desc (string-trim (alist-get 'extended pin))))
-            (unless (zerop (length desc))
-              (insert
-               "\n\n"
-               (pinboard-caption "Description") "\n"
-               (with-temp-buffer
-                 (insert desc)
-                 (fill-region (point-min) (point-max))
-                 (buffer-string)))))
-          (insert
-           "\n\n"
-           (pinboard-caption "Time") "\n"
-           (funcall pinboard-time-format-function (alist-get 'time pin)) "\n\n"
-           (pinboard-caption "Public") "\n"
-           (capitalize (alist-get 'shared pin)) "\n\n"
-           (pinboard-caption "Unread") "\n"
-           (capitalize (alist-get 'toread pin)) "\n\n"
-           (pinboard-caption "Tags") "\n"
-           (alist-get 'tags pin)))))))
+  (pinboard-with-current-pin pin
+    (with-help-window "*Pinboard pin*"
+      (with-current-buffer standard-output
+        (insert
+         (pinboard-caption "Title") "\n"
+         (alist-get 'description pin) "\n\n"
+         (pinboard-caption "URL") "\n")
+        (help-insert-xref-button
+         (alist-get 'href pin)
+         'help-url
+         (alist-get 'href pin))
+        (let ((desc (string-trim (alist-get 'extended pin))))
+          (unless (zerop (length desc))
+            (insert
+             "\n\n"
+             (pinboard-caption "Description") "\n"
+             (with-temp-buffer
+               (insert desc)
+               (fill-region (point-min) (point-max))
+               (buffer-string)))))
+        (insert
+         "\n\n"
+         (pinboard-caption "Time") "\n"
+         (funcall pinboard-time-format-function (alist-get 'time pin)) "\n\n"
+         (pinboard-caption "Public") "\n"
+         (capitalize (alist-get 'shared pin)) "\n\n"
+         (pinboard-caption "Unread") "\n"
+         (capitalize (alist-get 'toread pin)) "\n\n"
+         (pinboard-caption "Tags") "\n"
+         (alist-get 'tags pin))))))
 
 (defun pinboard-unread ()
   "Only show unread pins."
@@ -316,6 +348,164 @@ The title, description and tags are all searched. Search is case-insensitive."
   (interactive)
   (pinboard-redraw))
 
+(defmacro pinboard-field (suffix widget)
+  "Create a Pinboard field for a form.
+
+The field name will be pinboard-field- followed by SUFFIX, and
+its value will be set to WIDGET."
+  (declare (indent 1))
+  (let ((name (intern (format "pinboard-field-%s" suffix))))
+    `(progn
+       (make-local-variable (defvar ,name))
+       (setq ,name ,widget))))
+
+(defun pinboard-refresh-locally (url title description tags private to-read)
+  "Refresh the local list of pins with the given information.
+
+Parameters are:
+
+URL         - The URL of the pin.
+TITLE       - The title to give the pin.
+DESCRIPTION - The longer description to give the pin.
+TAGS        - The tags of the pin.
+PRIVATE     - Is the pin private or not?
+TO-READ     - Should the pin be marked has having being read or not?
+
+This function updates the local copy of the pins held in
+`pinboard-pins' (which should always be accessed via
+`pinboard-get-pins'). If the URL already exists in
+`pinboard-pins' the entry will be updated, otherwise a new pin
+will be added to `pinboard-pins'."
+  ;; Find any existing pin data based on the URL.
+  (let ((pin (pinboard-find-pin 'href url)))
+    ;; Update all the normal values.
+    (setf (alist-get 'href pin) url)
+    (setf (alist-get 'description pin) title)
+    (setf (alist-get 'extended pin) description)
+    (setf (alist-get 'tags pin) tags)
+    (setf (alist-get 'shared pin) (if private "no" "yes"))
+    (setf (alist-get 'toread pin) (if to-read "yes" "no"))
+    ;; If there's no hash, we didn't really find a pin and we're building up
+    ;; data for a brand new one, so...
+    (unless (alist-get 'hash pin)
+      ;; Fake the hash; we need one so let's fake it and it'll do until we
+      ;; get the real one back from the server some time in the future.
+      (setf (alist-get 'hash pin) (md5 url))
+      ;; Ditto with the time. Set it to now and we'll go with the server
+      ;; version later on.
+      (setf (alist-get 'time pin) (format-time-string "%Y-%m-%dT%T%z"))
+      ;; Add the new faked pin to the start of the local pin list.
+      (setq pinboard-pins (vconcat (list pin) pinboard-pins)))))
+
+(defun pinboard-save (url title description tags private to-read)
+  "Save a new pin to Pinboard.
+
+The following values are added:
+
+URL         - The URL of the pin.
+TITLE       - The title to give the pin.
+DESCRIPTION - The longer description to give the pin.
+TAGS        - The tags of the pin.
+PRIVATE     - Is the pin private or not?
+TO-READ     - Should the pin be marked has having being read or not?"
+  (pinboard-call
+   (pinboard-with-params
+    (pinboard-api-url "posts" "add")
+    (cons 'url url)
+    (cons 'description title)
+    (cons 'extended description)
+    (cons 'tags tags)
+    (cons 'shared (if private "no" "yes"))
+    (cons 'toread (if to-read "yes" "no")))
+   :pinboard-save)
+  (pinboard-refresh-locally url title description tags private to-read)
+  (message "Saved %s to Pinboard" url))
+
+(defun pinboard-make-form (buffer-name title &optional pin)
+  "Make a pinboard edit form in the current buffer.
+
+A new buffer is created, with a name based around BUFFER-NAME.
+
+TITLE is shown at the top of the form and the form is optionally
+populated with the values of PIN."
+  (let ((form-buffer-name (format "*Pinboard: %s*" buffer-name)))
+    (when (get-buffer form-buffer-name)
+      (kill-buffer form-buffer-name))
+    (let ((buffer (get-buffer-create form-buffer-name)))
+      (with-current-buffer buffer
+        (widget-insert (format "%s\n\n" title))
+        (pinboard-field url
+          (widget-create 'editable-field :size 80 :format "URL:\n%v"
+                         (if pin (alist-get 'href pin) "")))
+        (pinboard-field title
+          (widget-create 'editable-field :size 80 :format "\nTitle:\n%v"
+                         (if pin (alist-get 'description pin) "")))
+        (pinboard-field description
+          (widget-create 'text :size 80 :format "\nDescription:\n%v"
+                         (if pin (alist-get 'extended pin) "")))
+        (pinboard-field tags
+          (widget-create 'editable-field :size 80 :format "\n\nTags:\n%v"
+                         (if pin (alist-get 'tags pin) "")))
+        (widget-insert "\n\nPrivate: ")
+        (pinboard-field private
+          (widget-create 'checkbox
+                         (if pin (not (string= (alist-get 'shared pin) "yes")) t)))
+        (widget-insert " To Read: ")
+        (pinboard-field to-read
+          (widget-create 'checkbox
+                         (if pin (string= (alist-get 'toread pin) "yes") t)))
+        (widget-insert "\n\n")
+        (widget-create 'push-button
+                       :notify
+                       (lambda (&rest _)
+                         (pinboard-save
+                          (widget-value pinboard-field-url)
+                          (widget-value pinboard-field-title)
+                          (widget-value pinboard-field-description)
+                          (widget-value pinboard-field-tags)
+                          (widget-value pinboard-field-private)
+                          (widget-value pinboard-field-to-read))
+                         (kill-buffer buffer))
+                       "Save")
+        (widget-insert " ")
+        (widget-create 'push-button
+                       :notify (lambda (&rest _) (kill-buffer buffer))
+                       "Cancel")
+        (widget-insert "\n")
+        (use-local-map widget-keymap)
+        (widget-setup)
+        (switch-to-buffer buffer)
+        (setf (point) (point-min))
+        (widget-forward 1)))))
+
+;;;###autoload
+(defun pinboard-add ()
+  "Add a new pin to Pinboard."
+  (interactive)
+  (pinboard-auth)
+  (if (pinboard-too-soon :pinboard-save)
+      (error "Too soon. Please try again in a few seconds")
+    (pinboard-make-form "New pin" "Add a new pin to Pinboard")))
+
+(defun pinboard-edit ()
+  "Edit the current pin in the pin list."
+  (interactive)
+  (pinboard-auth)
+  (if (pinboard-too-soon :pinboard-save)
+      (error "Too soon. Please try again in a few seconds")
+    (pinboard-with-current-pin pin
+      (pinboard-make-form "Edit pin" "Edit the pin" pin))))
+
+(defun pinboard-delete ()
+  "Delete the current pin in the pin list."
+  (interactive)
+  (pinboard-auth)
+  (if (pinboard-too-soon :pinboard-delete-pin)
+      (error "Too soon. Please try again in a few seconds")
+    (pinboard-with-current-pin pin
+      (when (y-or-n-p "Delete the current pin? ")
+        (pinboard-delete-pin (alist-get 'href pin))))))
+
 (defvar pinboard-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map t)
@@ -331,6 +521,9 @@ The title, description and tags are all searched. Search is case-insensitive."
     (define-key map "/"         #'pinboard-search)
     (define-key map " "         #'pinboard-view)
     (define-key map (kbd "RET") #'pinboard-open)
+    (define-key map "n"         #'pinboard-add)
+    (define-key map "e"         #'pinboard-edit)
+    (define-key map "d"         #'pinboard-delete)
     map)
   "Local keymap for `pinboard'.")
 

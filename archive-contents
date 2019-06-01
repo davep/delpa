@@ -1,6 +1,6 @@
 (1
  (pinboard .
-           [(0 2)
+           [(0 3)
             ((emacs
               (25)))
             "A pinboard.in client" single
