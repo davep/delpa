@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.3
+;; Version: 0.4
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
 ;; Package-Requires: ((emacs "25"))
@@ -63,6 +63,9 @@
   '((t :inherit (bold font-lock-function-name-face)))
   "Face used on captions in the Pinboard output windows."
   :group 'pinboard)
+
+(defconst pinboard-list-buffer-name "*Pinboard*"
+  "The name of the main Pinboard pin list buffer.")
 
 (defconst pinboard-api-url "https://api.pinboard.in/v1/%s?auth_token=%s&format=json"
   "Base URL of the Pinboard API.")
@@ -232,6 +235,12 @@ FILTER."
                 (seq-filter (or filter #'identity) (pinboard-get-pins))))
   (tabulated-list-print t))
 
+(defun pinboard-maybe-redraw ()
+  "Redraw the pin list, but only if it exists."
+  (when-let ((buffer (get-buffer pinboard-list-buffer-name)))
+    (with-current-buffer buffer
+      (pinboard-redraw))))
+
 (defmacro pinboard-with-current-pin (name &rest body)
   "Evaluate BODY with the currently-selected pin as NAME."
   (declare (indent 1))
@@ -395,7 +404,9 @@ will be added to `pinboard-pins'."
       ;; version later on.
       (setf (alist-get 'time pin) (format-time-string "%Y-%m-%dT%T%z"))
       ;; Add the new faked pin to the start of the local pin list.
-      (setq pinboard-pins (vconcat (list pin) pinboard-pins)))))
+      (setq pinboard-pins (vconcat (list pin) pinboard-pins)))
+    ;; If the pinboard list buffer is kicking around somewhere...
+    (pinboard-maybe-redraw)))
 
 (defun pinboard-save (url title description tags private to-read)
   "Save a new pin to Pinboard.
@@ -420,6 +431,19 @@ TO-READ     - Should the pin be marked has having being read or not?"
    :pinboard-save)
   (pinboard-refresh-locally url title description tags private to-read)
   (message "Saved %s to Pinboard" url))
+
+(defun pinboard-save-pin (pin)
+  "Save PIN to Pinboard.
+
+This is simply a wrapper around `pinboard-save' that pulls apart
+the pin data as is used in the main list."
+  (pinboard-save
+   (alist-get 'href pin)
+   (alist-get 'description pin)
+   (alist-get 'extended pin)
+   (alist-get 'tags pin)
+   (alist-get 'shared pin)
+   (alist-get 'toread pin)))
 
 (defun pinboard-make-form (buffer-name title &optional pin)
   "Make a pinboard edit form in the current buffer.
@@ -478,21 +502,30 @@ populated with the values of PIN."
         (setf (point) (point-min))
         (widget-forward 1)))))
 
+(defmacro pinboard-not-too-soon (action &rest body)
+  "Ensure the API isn't hit on too soon.
+
+A check is made to see if ACTION is happening too soon for the
+Pinboard API. If it is an error is emitted and BODY isn't
+evaluated, otherwise BODY is evaluated."
+  (declare (indent 1))
+  `(if (pinboard-too-soon ,action)
+       (error "Too soon. Please try again in a few seconds")
+     ,@body))
+
 ;;;###autoload
 (defun pinboard-add ()
   "Add a new pin to Pinboard."
   (interactive)
   (pinboard-auth)
-  (if (pinboard-too-soon :pinboard-save)
-      (error "Too soon. Please try again in a few seconds")
+  (pinboard-not-too-soon :pinboard-save
     (pinboard-make-form "New pin" "Add a new pin to Pinboard")))
 
 (defun pinboard-edit ()
   "Edit the current pin in the pin list."
   (interactive)
   (pinboard-auth)
-  (if (pinboard-too-soon :pinboard-save)
-      (error "Too soon. Please try again in a few seconds")
+  (pinboard-not-too-soon :pinboard-save
     (pinboard-with-current-pin pin
       (pinboard-make-form "Edit pin" "Edit the pin" pin))))
 
@@ -500,11 +533,21 @@ populated with the values of PIN."
   "Delete the current pin in the pin list."
   (interactive)
   (pinboard-auth)
-  (if (pinboard-too-soon :pinboard-delete-pin)
-      (error "Too soon. Please try again in a few seconds")
+  (pinboard-not-too-soon :pinboard-delete-pin
     (pinboard-with-current-pin pin
       (when (y-or-n-p "Delete the current pin? ")
-        (pinboard-delete-pin (alist-get 'href pin))))))
+        (pinboard-delete-pin (alist-get 'href pin))))
+    (pinboard-maybe-redraw)))
+
+(defun pinboard-toggle-read ()
+  "Toggle the read/unread status of the current pin in the list."
+  (interactive)
+  (pinboard-auth)
+  (pinboard-not-too-soon :pinboard-save
+    (pinboard-with-current-pin pin
+      (let ((current (alist-get 'toread pin)))
+        (setf (alist-get 'toread pin) (if (string= current "yes") "no" "yes"))
+        (pinboard-save-pin pin)))))
 
 (defvar pinboard-mode-map
   (let ((map (make-sparse-keymap)))
@@ -524,6 +567,7 @@ populated with the values of PIN."
     (define-key map "n"         #'pinboard-add)
     (define-key map "e"         #'pinboard-edit)
     (define-key map "d"         #'pinboard-delete)
+    (define-key map "R"         #'pinboard-toggle-read)
     map)
   "Local keymap for `pinboard'.")
 
@@ -544,7 +588,7 @@ populated with the values of PIN."
   (pinboard-auth)
   (if (not pinboard-api-token)
       (error "Please set your Pinboard API token")
-    (pop-to-buffer "*Pinboard*")
+    (pop-to-buffer pinboard-list-buffer-name)
     (pinboard-mode)
     (pinboard-refresh)))
 
