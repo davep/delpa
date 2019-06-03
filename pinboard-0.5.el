@@ -2,10 +2,10 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.4
+;; Version: 0.5
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
-;; Package-Requires: ((emacs "25"))
+;; Package-Requires: ((emacs "25") (cl-lib "0.5"))
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the
@@ -31,6 +31,7 @@
 (require 'subr-x)
 (require 'url-vars)
 (require 'widget)
+(require 'cl-lib)
 (require 'wid-edit)
 (require 'browse-url)
 (require 'url-util)
@@ -40,7 +41,10 @@
 (defgroup pinboard nil
   "Pinboard client for Emacs."
   :group 'hypermedia
-  :link '(url-link :tag "GitHub" "https://github.com/davep/pinboard.el"))
+  :link '(url-link :tag "pinboard.el on GitHub"
+                   "https://github.com/davep/pinboard.el")
+  :link '(url-link :tag "Pinboard"
+                   "https://pinboard.in/"))
 
 (defcustom pinboard-private-symbol "-"
   "The character to use to show a pin is private."
@@ -62,6 +66,16 @@
 (defface pinboard-caption
   '((t :inherit (bold font-lock-function-name-face)))
   "Face used on captions in the Pinboard output windows."
+  :group 'pinboard)
+
+(defface pinboard-unread-face
+  '((t :inherit (bold)))
+  "Face used for unread pins in the pin list."
+  :group 'pinboard)
+
+(defface pinboard-read-face
+  '((t :inherit (default)))
+  "Face used for read pins in the pin list."
   :group 'pinboard)
 
 (defconst pinboard-list-buffer-name "*Pinboard*"
@@ -221,18 +235,25 @@ The pin is returned if VALUE matches."
 
 Optionally filter the list of pins to draw using the function
 FILTER."
-  (setq tabulated-list-entries
-        (mapcar (lambda (pin)
-                  (list
-                   (alist-get 'hash pin)
-                   (vector
-                    (if (string= (alist-get 'shared pin) "yes")
-                        pinboard-public-symbol
-                      pinboard-private-symbol)
-                    (alist-get 'description pin)
-                    (funcall pinboard-time-format-function (alist-get 'time pin))
-                    (alist-get 'href pin))))
-                (seq-filter (or filter #'identity) (pinboard-get-pins))))
+  (cl-flet ((highlight (s pin)
+                       (propertize s 'face
+                                   (if (string= (alist-get 'toread pin) "yes")
+                                       'pinboard-unread-face
+                                     'pinboard-read-face))))
+    (setq tabulated-list-entries
+          (mapcar (lambda (pin)
+                    (list
+                     (alist-get 'hash pin)
+                     (vector
+                      (highlight
+                       (if (string= (alist-get 'shared pin) "yes")
+                           pinboard-public-symbol
+                         pinboard-private-symbol)
+                       pin)
+                      (highlight (alist-get 'description pin) pin)
+                      (highlight (funcall pinboard-time-format-function (alist-get 'time pin)) pin)
+                      (highlight (alist-get 'href pin) pin))))
+                  (seq-filter (or filter #'identity) (pinboard-get-pins)))))
   (tabulated-list-print t))
 
 (defun pinboard-maybe-redraw ()
@@ -442,8 +463,8 @@ the pin data as is used in the main list."
    (alist-get 'description pin)
    (alist-get 'extended pin)
    (alist-get 'tags pin)
-   (alist-get 'shared pin)
-   (alist-get 'toread pin)))
+   (string= (alist-get 'shared pin) "no")
+   (string= (alist-get 'toread pin) "yes")))
 
 (defun pinboard-make-form (buffer-name title &optional pin)
   "Make a pinboard edit form in the current buffer.

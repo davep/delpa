@@ -1,8 +1,10 @@
 (1
  (pinboard .
-           [(0 4)
+           [(0 5)
             ((emacs
-              (25)))
+              (25))
+             (cl-lib
+              (0 5)))
             "A pinboard.in client" single
             ((:authors
               ("Dave Pearson" . "davep@davep.org"))
