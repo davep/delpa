@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.5
+;; Version: 0.6
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
 ;; Package-Requires: ((emacs "25") (cl-lib "0.5"))
@@ -29,12 +29,12 @@
 (require 'seq)
 (require 'json)
 (require 'subr-x)
-(require 'url-vars)
 (require 'widget)
 (require 'cl-lib)
+(require 'url-vars)
+(require 'url-util)
 (require 'wid-edit)
 (require 'browse-url)
-(require 'url-util)
 (require 'parse-time)
 (require 'auth-source)
 
@@ -63,7 +63,7 @@
   :type 'function
   :group 'pinboard)
 
-(defface pinboard-caption
+(defface pinboard-caption-face
   '((t :inherit (bold font-lock-function-name-face)))
   "Face used on captions in the Pinboard output windows."
   :group 'pinboard)
@@ -156,7 +156,11 @@ to help set rate limits."
     (pinboard-remember-call caller)
     (with-temp-buffer
       (url-insert-file-contents url)
-      (json-read-from-string (buffer-string)))))
+      (condition-case err
+          (json-read-from-string (buffer-string))
+        (error
+         (error "Error '%s' handling reply from Pinboard: %s"
+                (error-message-string err) (buffer-string)))))))
 
 (defun pinboard-last-updated ()
   "Get when Pinboard was last updated."
@@ -236,7 +240,7 @@ The pin is returned if VALUE matches."
 Optionally filter the list of pins to draw using the function
 FILTER."
   (cl-flet ((highlight (s pin)
-                       (propertize s 'face
+                       (propertize s 'font-lock-face
                                    (if (string= (alist-get 'toread pin) "yes")
                                        'pinboard-unread-face
                                      'pinboard-read-face))))
@@ -266,11 +270,13 @@ FILTER."
   "Evaluate BODY with the currently-selected pin as NAME."
   (declare (indent 1))
   (let ((pin-id (gensym)))
-    `(when-let ((,pin-id  (tabulated-list-get-id)))
-       (let ((,name (pinboard-find-pin 'hash ,pin-id)))
-         (if ,name
-             (progn ,@body)
-           (error "Could not find pin %s" (tabulated-list-get-id)))))))
+    `(if (not (string= (buffer-name) pinboard-list-buffer-name))
+         (error "Only available in the Pinboard list buffer")
+       (when-let ((,pin-id  (tabulated-list-get-id)))
+         (let ((,name (pinboard-find-pin 'hash ,pin-id)))
+           (if ,name
+               (progn ,@body)
+             (error "Could not find pin %s" ,pin-id)))))))
 
 (defun pinboard-open ()
   "Open the currently-highlighted pin in a web browser."
@@ -287,7 +293,7 @@ FILTER."
 
 (defun pinboard-caption (s)
   "Add properties to S to make it a caption for Pinboard output."
-  (propertize (concat s ": ") 'font-lock-face 'pinboard-caption))
+  (propertize (concat s ": ") 'font-lock-face 'pinboard-caption-face))
 
 (defun pinboard-view ()
   "View the details of the currently-highlighted pin."
@@ -378,17 +384,6 @@ The title, description and tags are all searched. Search is case-insensitive."
   (interactive)
   (pinboard-redraw))
 
-(defmacro pinboard-field (suffix widget)
-  "Create a Pinboard field for a form.
-
-The field name will be pinboard-field- followed by SUFFIX, and
-its value will be set to WIDGET."
-  (declare (indent 1))
-  (let ((name (intern (format "pinboard-field-%s" suffix))))
-    `(progn
-       (make-local-variable (defvar ,name))
-       (setq ,name ,widget))))
-
 (defun pinboard-refresh-locally (url title description tags private to-read)
   "Refresh the local list of pins with the given information.
 
@@ -466,6 +461,17 @@ the pin data as is used in the main list."
    (string= (alist-get 'shared pin) "no")
    (string= (alist-get 'toread pin) "yes")))
 
+(defmacro pinboard-field (suffix widget)
+  "Create a Pinboard field for a form.
+
+The field name will be pinboard-field- followed by SUFFIX, and
+its value will be set to WIDGET."
+  (declare (indent 1))
+  (let ((name (intern (format "pinboard-field-%s" suffix))))
+    `(progn
+       (make-local-variable (defvar ,name))
+       (setq ,name ,widget))))
+
 (defun pinboard-make-form (buffer-name title &optional pin)
   "Make a pinboard edit form in the current buffer.
 
@@ -478,24 +484,32 @@ populated with the values of PIN."
       (kill-buffer form-buffer-name))
     (let ((buffer (get-buffer-create form-buffer-name)))
       (with-current-buffer buffer
-        (widget-insert (format "%s\n\n" title))
+        (widget-insert (format "%s\n\n" (pinboard-caption title)))
         (pinboard-field url
-          (widget-create 'editable-field :size 80 :format "URL:\n%v"
+          (widget-create 'editable-field
+                         :size 80
+                         :format (format "%s\n%%v" (pinboard-caption "URL"))
                          (if pin (alist-get 'href pin) "")))
         (pinboard-field title
-          (widget-create 'editable-field :size 80 :format "\nTitle:\n%v"
+          (widget-create 'editable-field
+                         :size 80
+                         :format (format "\n%s\n%%v" (pinboard-caption "Title"))
                          (if pin (alist-get 'description pin) "")))
         (pinboard-field description
-          (widget-create 'text :size 80 :format "\nDescription:\n%v"
+          (widget-create 'text
+                         :size 80
+                         :format (format "\n%s\n%%v" (pinboard-caption "Description"))
                          (if pin (alist-get 'extended pin) "")))
         (pinboard-field tags
-          (widget-create 'editable-field :size 80 :format "\n\nTags:\n%v"
+          (widget-create 'editable-field
+                         :size 80
+                         :format (format "\n\n%s\n%%v" (pinboard-caption "Tags"))
                          (if pin (alist-get 'tags pin) "")))
-        (widget-insert "\n\nPrivate: ")
+        (widget-insert "\n\n" (pinboard-caption "Private"))
         (pinboard-field private
           (widget-create 'checkbox
                          (if pin (not (string= (alist-get 'shared pin) "yes")) t)))
-        (widget-insert " To Read: ")
+        (widget-insert " " (pinboard-caption "To Read"))
         (pinboard-field to-read
           (widget-create 'checkbox
                          (if pin (string= (alist-get 'toread pin) "yes") t)))
@@ -503,6 +517,10 @@ populated with the values of PIN."
         (widget-create 'push-button
                        :notify
                        (lambda (&rest _)
+                         (when (string-empty-p (widget-value pinboard-field-url))
+                           (error "Please provide a URL for the pin"))
+                         (when (string-empty-p (widget-value pinboard-field-title))
+                           (error "Please provide a title for the pin"))
                          (pinboard-save
                           (widget-value pinboard-field-url)
                           (widget-value pinboard-field-title)
@@ -519,6 +537,7 @@ populated with the values of PIN."
         (widget-insert "\n")
         (use-local-map widget-keymap)
         (widget-setup)
+        (font-lock-mode)
         (switch-to-buffer buffer)
         (setf (point) (point-min))
         (widget-forward 1)))))
@@ -557,8 +576,8 @@ evaluated, otherwise BODY is evaluated."
   (pinboard-not-too-soon :pinboard-delete-pin
     (pinboard-with-current-pin pin
       (when (y-or-n-p "Delete the current pin? ")
-        (pinboard-delete-pin (alist-get 'href pin))))
-    (pinboard-maybe-redraw)))
+        (pinboard-delete-pin (alist-get 'href pin))
+        (pinboard-maybe-redraw)))))
 
 (defun pinboard-toggle-read ()
   "Toggle the read/unread status of the current pin in the list."
@@ -593,7 +612,11 @@ evaluated, otherwise BODY is evaluated."
   "Local keymap for `pinboard'.")
 
 (define-derived-mode pinboard-mode tabulated-list-mode "Pinboard Mode"
-  "Major mode for handling a list of Pinboard pins."
+  "Major mode for handling a list of Pinboard pins.
+
+The key bindings for `pinboard-mode' are:
+
+\\{pinboard-mode-map}"
   (setq tabulated-list-format
         [("P" 1 t)
          ("Description" 60 t)
@@ -604,7 +627,11 @@ evaluated, otherwise BODY is evaluated."
 
 ;;;###autoload
 (defun pinboard ()
-  "Browse your Pinboard pins."
+  "Browse your Pinboard pins.
+
+Key bindings that are active in the pin list include:
+
+\\{pinboard-mode-map}"
   (interactive)
   (pinboard-auth)
   (if (not pinboard-api-token)
