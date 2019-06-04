@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.6
+;; Version: 0.7
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
 ;; Package-Requires: ((emacs "25") (cl-lib "0.5"))
@@ -63,6 +63,11 @@
   :type 'function
   :group 'pinboard)
 
+(defcustom pinboard-confirm-toggle-read t
+  "Should we confirm toggling the read state of a pin?"
+  :type 'boolean
+  :group 'pinboard)
+
 (defface pinboard-caption-face
   '((t :inherit (bold font-lock-function-name-face)))
   "Face used on captions in the Pinboard output windows."
@@ -104,6 +109,9 @@ REPOSITORY!")
 
 (defvar pinboard-tags nil
   "Cache of tags the user has used.")
+
+(defvar pinboard-last-filter nil
+  "The last filter used by `pinboard-redraw'.")
 
 (defun pinboard-remember-call (caller)
   "Remember now as when CALLER was last called."
@@ -181,10 +189,9 @@ to help set rate limits."
     ;; don't have any tags yet...
     (if (or (not pinboard-tags) (< (pinboard-last-called :pinboard-get-tags) (pinboard-last-updated)))
         ;; ...grab a copy of the user's tags.
-        (setq pinboard-tags
-              (pinboard-call
-               (pinboard-api-url "tags" "get")
-               :pinboard-get-tags))
+        (setq pinboard-tags (pinboard-call
+                             (pinboard-api-url "tags" "get")
+                             :pinboard-get-tags))
       ;; Looks like nothing has changed, so go with the tags we've already
       ;; got.
       pinboard-tags)))
@@ -219,9 +226,9 @@ to help set rate limits."
   ;; Filter out any versions held locally.
   (when pinboard-pins
     (setq pinboard-pins
-          (seq-remove (lambda (pin)
-                        (string= (alist-get 'href pin) href))
-                      pinboard-pins)))
+          (seq-remove
+           (lambda (pin) (string= (alist-get 'href pin) href))
+           pinboard-pins)))
   ;; Let the user know we did it.
   (message "Deleted \"%s\"." href))
 
@@ -230,8 +237,7 @@ to help set rate limits."
 
 The pin is returned if VALUE matches."
   (seq-find
-   (lambda (pin)
-     (string= (alist-get via pin) value))
+   (lambda (pin) (string= (alist-get via pin) value))
    (pinboard-get-pins)))
 
 (defun pinboard-redraw (&optional filter)
@@ -257,14 +263,16 @@ FILTER."
                       (highlight (alist-get 'description pin) pin)
                       (highlight (funcall pinboard-time-format-function (alist-get 'time pin)) pin)
                       (highlight (alist-get 'href pin) pin))))
-                  (seq-filter (or filter #'identity) (pinboard-get-pins)))))
+                  (seq-filter
+                   (setq pinboard-last-filter (or filter #'identity))
+                   (pinboard-get-pins)))))
   (tabulated-list-print t))
 
 (defun pinboard-maybe-redraw ()
   "Redraw the pin list, but only if it exists."
   (when-let ((buffer (get-buffer pinboard-list-buffer-name)))
     (with-current-buffer buffer
-      (pinboard-redraw))))
+      (pinboard-redraw pinboard-last-filter))))
 
 (defmacro pinboard-with-current-pin (name &rest body)
   "Evaluate BODY with the currently-selected pin as NAME."
@@ -575,7 +583,7 @@ evaluated, otherwise BODY is evaluated."
   (pinboard-auth)
   (pinboard-not-too-soon :pinboard-delete-pin
     (pinboard-with-current-pin pin
-      (when (y-or-n-p "Delete the current pin? ")
+      (when (yes-or-no-p (format "Delete \"%s\"? " (alist-get 'href pin)))
         (pinboard-delete-pin (alist-get 'href pin))
         (pinboard-maybe-redraw)))))
 
@@ -585,9 +593,13 @@ evaluated, otherwise BODY is evaluated."
   (pinboard-auth)
   (pinboard-not-too-soon :pinboard-save
     (pinboard-with-current-pin pin
-      (let ((current (alist-get 'toread pin)))
-        (setf (alist-get 'toread pin) (if (string= current "yes") "no" "yes"))
-        (pinboard-save-pin pin)))))
+      (let ((current (string= (alist-get 'toread pin) "yes")))
+        (when (or (not pinboard-confirm-toggle-read)
+                  (y-or-n-p (format "Mark \"%s\" as %sread? "
+                                    (alist-get 'href pin)
+                                    (if current "" "un"))))
+          (setf (alist-get 'toread pin) (if current "no" "yes"))
+          (pinboard-save-pin pin))))))
 
 (defvar pinboard-mode-map
   (let ((map (make-sparse-keymap)))

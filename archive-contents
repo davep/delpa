@@ -1,6 +1,6 @@
 (1
  (pinboard .
-           [(0 6)
+           [(0 7)
             ((emacs
               (25))
              (cl-lib
