@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.7
+;; Version: 1.0
 ;; Keywords: hypermedia, bookmarking, reading, pinboard
 ;; URL: https://github.com/davep/pinboard.el
 ;; Package-Requires: ((emacs "25") (cl-lib "0.5"))
@@ -23,6 +23,25 @@
 ;;; Commentary:
 ;;
 ;; pinboard.el provides an Emacs client for pinboard.in.
+;;
+;; To get started, visit your password settings page
+;; (https://pinboard.in/settings/password) on Pinboard and get the API token
+;; that's displayed there. Then edit ~/.authinfo and add a line like this:
+;;
+;; machine api.pinboard.in password foo:8ar8a5w188l3
+;;
+;; Once done, you can M-x pinboard RET and browse your pins. A number of
+;; commands are available when viewing the pin list, press "?" or see the
+;; "Pinboard" menu for more information.
+;;
+;; Commands available that aren't part of the pin list, and that you might
+;; want to bind to keys, include:
+;;
+;; | Command                | Description                           |
+;; | ---------------------- | ------------------------------------- |
+;; | pinboard               | Open the Pinboard pin list            |
+;; | pinboard-add           | Add a new pin to Pinboard             |
+;; | pinboard-add-for-later | Prompt for a URL and add it for later |
 
 ;;; Code:
 
@@ -34,6 +53,8 @@
 (require 'url-vars)
 (require 'url-util)
 (require 'wid-edit)
+(require 'easymenu)
+(require 'thingatpt)
 (require 'browse-url)
 (require 'parse-time)
 (require 'auth-source)
@@ -113,6 +134,12 @@ REPOSITORY!")
 (defvar pinboard-last-filter nil
   "The last filter used by `pinboard-redraw'.")
 
+(defvar pinboard-tag-filter nil
+  "The current list of tags we're filtering by.
+
+Used by `pinboard-tagged' to create an additive filtering
+effect.")
+
 (defun pinboard-remember-call (caller)
   "Remember now as when CALLER was last called."
   (put caller :pinboard-last-called (float-time)))
@@ -127,18 +154,15 @@ REPOSITORY!")
 See if we're calling CALLER before RATE has expired. RATE is
 optional and defaults to 3 seconds (as per the pinboard API
 documentation.)"
-  (let ((last (pinboard-last-called caller)))
-    (when last
-      (<= (- (float-time) last) (or rate 3)))))
+  (when-let ((last (pinboard-last-called caller)))
+    (<= (- (float-time) last) (or rate 3))))
 
 (defun pinboard-auth ()
   "Attempt to get the API token for Pinboard."
   (unless pinboard-api-token
-    (let ((auth (car (auth-source-search :host "api.pinboard.in" :requires '(secret)))))
-      (when auth
-        (let ((token (plist-get auth :secret)))
-          (when token
-            (setq pinboard-api-token (funcall token))))))))
+    (when-let ((auth (car (auth-source-search :host "api.pinboard.in" :requires '(secret))))
+               (token (plist-get auth :secret)))
+      (setq pinboard-api-token (funcall token)))))
 
 (defun pinboard-api-url (&rest params)
   "Build the API call from PARAMS."
@@ -174,9 +198,8 @@ to help set rate limits."
   "Get when Pinboard was last updated."
   (if (pinboard-too-soon :pinboard-last-updated)
       pinboard-last-updated
-    (let ((result (alist-get 'update_time (pinboard-call (pinboard-api-url "posts" "update") :pinboard-last-updated))))
-      (when result
-        (setq pinboard-last-updated (float-time (parse-iso8601-time-string result)))))))
+    (when-let ((result (alist-get 'update_time (pinboard-call (pinboard-api-url "posts" "update") :pinboard-last-updated))))
+      (setq pinboard-last-updated (float-time (parse-iso8601-time-string result))))))
 
 (defun pinboard-get-tags ()
   "Get the list of tags used by the user."
@@ -245,6 +268,10 @@ The pin is returned if VALUE matches."
 
 Optionally filter the list of pins to draw using the function
 FILTER."
+  ;; If there is no filter...
+  (unless filter
+    ;; ...ensure any ongoing tagging filter gets cleared.
+    (setq pinboard-tag-filter nil))
   (cl-flet ((highlight (s pin)
                        (propertize s 'font-lock-face
                                    (if (string= (alist-get 'toread pin) "yes")
@@ -357,13 +384,28 @@ FILTER."
   (interactive)
   (pinboard-redraw (lambda (pin) (string= (alist-get 'shared pin) "no"))))
 
+(defun pinboard-read-tag ()
+  "Read and return a Pinboard tag from the user."
+  (completing-read "Tag: " (pinboard-get-tags)))
+
+(defun pinboard-extend-tagged (tag)
+  "Add TAG to the current tag filter and redraw."
+  (interactive (list (pinboard-read-tag)))
+  (cl-pushnew (downcase tag) pinboard-tag-filter :test #'equal)
+  (pinboard-redraw
+   (lambda (pin)
+     (=
+      (length (seq-intersection
+               (split-string (downcase (alist-get 'tags pin)))
+               pinboard-tag-filter))
+      (length pinboard-tag-filter))))
+  (message "Showing all pins tagged: %s" (string-join pinboard-tag-filter ", ")))
+
 (defun pinboard-tagged (tag)
-  "Only show pins that are tagged with TAG."
-  (interactive (list (completing-read "Tag: " (pinboard-get-tags))))
-  (let ((tag (downcase tag)))
-    (pinboard-redraw
-     (lambda (pin)
-       (seq-contains (split-string (downcase (alist-get 'tags pin))) tag)))))
+  "Show all pins tagged with TAG."
+  (interactive (list (pinboard-read-tag)))
+  (setq pinboard-tag-filter nil)
+  (pinboard-extend-tagged tag))
 
 (defun pinboard-untagged ()
   "Only show pints that have no tags."
@@ -487,7 +529,9 @@ A new buffer is created, with a name based around BUFFER-NAME.
 
 TITLE is shown at the top of the form and the form is optionally
 populated with the values of PIN."
-  (let ((form-buffer-name (format "*Pinboard: %s*" buffer-name)))
+  (let ((default-url (unless (derived-mode-p 'pinboard-mode)
+                       (thing-at-point-url-at-point)))
+        (form-buffer-name (format "*Pinboard: %s*" buffer-name)))
     (when (get-buffer form-buffer-name)
       (kill-buffer form-buffer-name))
     (let ((buffer (get-buffer-create form-buffer-name)))
@@ -497,7 +541,9 @@ populated with the values of PIN."
           (widget-create 'editable-field
                          :size 80
                          :format (format "%s\n%%v" (pinboard-caption "URL"))
-                         (if pin (alist-get 'href pin) "")))
+                         (if pin
+                             (alist-get 'href pin)
+                           (or default-url ""))))
         (pinboard-field title
           (widget-create 'editable-field
                          :size 80
@@ -601,6 +647,20 @@ evaluated, otherwise BODY is evaluated."
           (setf (alist-get 'toread pin) (if current "no" "yes"))
           (pinboard-save-pin pin))))))
 
+;;;###autoload
+(defun pinboard-add-for-later (url)
+  "Quickly add URL for later review and reading.
+
+This command simply prompts for a URL and adds it to Pinboard as
+private and unread, so you can come back to it and look at it
+later."
+  (interactive (list (read-string "URL: " (thing-at-point-url-at-point))))
+  (if (string-empty-p (string-trim url))
+      (error "Please provide a URL to save")
+    (pinboard-auth)
+    (pinboard-not-too-soon :pinboard-save
+      (pinboard-save url url "" "" t t))))
+
 (defvar pinboard-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map t)
@@ -611,8 +671,9 @@ evaluated, otherwise BODY is evaluated."
     (define-key map "P"         #'pinboard-private)
     (define-key map "u"         #'pinboard-unread)
     (define-key map "r"         #'pinboard-read)
-    (define-key map "t"         #'pinboard-tagged)
-    (define-key map "T"         #'pinboard-untagged)
+    (define-key map "t"         #'pinboard-extend-tagged)
+    (define-key map "T"         #'pinboard-tagged)
+    (define-key map "U"         #'pinboard-untagged)
     (define-key map "/"         #'pinboard-search)
     (define-key map " "         #'pinboard-view)
     (define-key map (kbd "RET") #'pinboard-open)
@@ -636,6 +697,30 @@ The key bindings for `pinboard-mode' are:
          ("URL" 30 t)])
   (tabulated-list-init-header)
   (setq tabulated-list-sort-key '("Time" . t)))
+
+(easy-menu-define pinboard-mode-menu pinboard-mode-map "Pinboard menu"
+  '("Pinboard"
+    ["Refresh/Show all"               pinboard-refresh]
+    ["View pin"                       pinboard-view        (tabulated-list-get-id)]
+    ["Add URL to kill buffer"         pinboard-kill-url    (tabulated-list-get-id)]
+    ["Search pins..."                 pinboard-search]
+    "--"
+    ["Add a pin..."                   pinboard-add]
+    ["Edit the current pin..."        pinboard-edit        (tabulated-list-get-id)]
+    ["Toggle read status..."          pinboard-toggle-read (tabulated-list-get-id)]
+    ["Delete the current pin..."      pinboard-delete      (tabulated-list-get-id)]
+    "--"
+    ["Show public pins"               pinboard-public]
+    ["Show private pins"              pinboard-private]
+    "--"
+    ["Show read pins"                 pinboard-read]
+    ["Show unread pins"               pinboard-unread]
+    "--"
+    ["Show pins tagged..."            pinboard-tagged]
+    ["Add tag to current tag view..." pinboard-extend-tagged pinboard-tag-filter]
+    ["Show untagged pins"             pinboard-untagged]
+    "--"
+    ["Quit"                           quit-window]))
 
 ;;;###autoload
 (defun pinboard ()
