@@ -1,8 +1,8 @@
 ;;; make-phony.el --- Make a Makefile target PHONY -*- lexical-binding: t -*-
-;; Copyright 2018 by Dave Pearson <davep@davep.org>
+;; Copyright 2018-2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 1.1
+;; Version: 1.2
 ;; Keywords: convenience
 ;; URL: https://github.com/davep/make-phony.el
 ;; Package-Requires: ((emacs "24"))
@@ -23,7 +23,7 @@
 ;;; Commentary:
 ;;
 ;; make-phony.el provides a simple command that can be used to make a target
-;; a Makefile into a PHONY target.
+;; in a Makefile into a PHONY target.
 
 ;;; Code:
 
@@ -34,7 +34,7 @@
   (if (derived-mode-p 'makefile-gmake-mode 'makefile-bsdmake-mode)
       (save-excursion
         (setf (point) (point-at-bol))
-        (if (looking-at "^\\([[:alnum:]]+\\):")
+        (if (looking-at (rx bol (group (+ (not (any ":")))) ":"))
             (let ((phony (match-string 1)))
               (insert (format ".PHONY: %s" phony))
               (newline))

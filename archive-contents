@@ -31,7 +31,7 @@
               (:maintainer "Dave Pearson" . "davep@davep.org")
               (:url . "https://github.com/davep/wordcloud.el"))])
  (make-phony .
-             [(1 1)
+             [(1 2)
               ((emacs
                 (24)))
               "Make a Makefile target PHONY" single
