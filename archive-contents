@@ -1,4 +1,13 @@
 (1
+ (pypath .
+         [(0 1)
+          ((emacs
+            (24 4)))
+          "Get dotted path for Python defun" single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/pypath.el"))])
  (pinboard .
            [(1 0)
             ((emacs
