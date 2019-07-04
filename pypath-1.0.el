@@ -2,10 +2,10 @@
 ;; Copyright 2019 by Dave Pearson <davep@davep.org>
 
 ;; Author: Dave Pearson <davep@davep.org>
-;; Version: 0.01
+;; Version: 1.0
 ;; Keywords: languages
 ;; URL: https://github.com/davep/pypath.el
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "25"))
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the
@@ -24,13 +24,15 @@
 ;;
 ;; pypath.el is a quick-and-dirty tool to help me find the dotted path/name
 ;; of the current defun in a Python file. It's mostly useful when I want to
-;; test a very specific unit test when working on a Django application.
+;; test a very specific unit test when working on a Django application. It
+;; also assumes that pipenv is the way to handle things.
 ;;
 ;; It's highly unlikely to be useful to anyone else.
 
 ;;; Code:
 
 (require 'python)
+(require 'subr-x)
 
 (defun pypath--find-manage (path route)
   "Look for manage.py.
@@ -42,15 +44,15 @@ been. If manage.py is found the route to it will be returned."
     (when path
       (pypath--find-manage (cdr path) (cons (car path) route)))))
 
-;;;###autoload
-(defun pypath ()
+(defun pypath--get-path ()
   "Get the full dotted path for the current Python code.
 
-As a side-effect the path is placed in the kill ring.
+As a side-effect, various environmental checks are done and if
+there is a problem an `error' is thrown. Rules include:
 
-Mainly helpful for getting the full name of a unit test. Also
-only really useful when working on a Django application."
-  (interactive)
+- Current buffer must be in `python-mode'
+- Current buffer must have a non-nil `buffer-file-name'
+- `python-info-current-defun' must return a non-nil value"
   (unless (derived-mode-p 'python-mode)
     (error "This is only designed for use with `python-mode'"))
   (unless (buffer-file-name)
@@ -61,8 +63,30 @@ only really useful when working on a Django application."
     (let* ((path (reverse (split-string (buffer-file-name) "/")))
            (module (file-name-sans-extension (pop path)))
            (pyfun (string-join (append (pypath--find-manage path nil) (list module pyfun)) ".")))
-      (kill-new pyfun)
-      (message "%s" pyfun))))
+      pyfun)))
+
+;;;###autoload
+(defun pypath ()
+  "Get hold of the dotted path of the current Python function.
+
+As well as displaying it with `message', the path is also placed
+into the kill ring with `kill-new'."
+  (interactive)
+  (when-let ((pyfun (pypath--get-path)))
+    (kill-new pyfun)
+    (message "%s" pyfun)))
+
+;;;###autoload
+(defun pypath-django-test ()
+  "Get the full Django test command.
+
+As well as displaying it with `message', the path is also placed
+into the kill ring with `kill-new'."
+  (interactive)
+  (when-let ((pyfun (pypath--get-path))
+             (test (format "pipenv run ./manage.py test -v2 %s" pyfun)))
+    (kill-new test)
+    (message "%s" test)))
 
 (provide 'pypath)
 

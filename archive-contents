@@ -1,8 +1,8 @@
 (1
  (pypath .
-         [(0 1)
+         [(1 0)
           ((emacs
-            (24 4)))
+            (25)))
           "Get dotted path for Python defun" single
           ((:authors
             ("Dave Pearson" . "davep@davep.org"))
