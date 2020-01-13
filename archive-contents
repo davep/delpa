@@ -1,4 +1,15 @@
 (1
+ (dnote .
+        [(1 0)
+         ((emacs
+           (24 3))
+          (markdown-mode
+           (2 0)))
+         "Wrapper for the dnote CLI" single
+         ((:authors
+           ("Dave Pearson" . "davep@davep.org"))
+          (:maintainer "Dave Pearson" . "davep@davep.org")
+          (:url . "https://github.com/davep/dnote.el"))])
  (gitweb .
          [(1 0)
           ((emacs
