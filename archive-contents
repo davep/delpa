@@ -95,13 +95,6 @@
              ("Dave Pearson" . "davep@davep.org"))
             (:maintainer "Dave Pearson" . "davep@davep.org")
             (:url . "https://github.com/davep/commoji.el"))])
- (highlight-chars .
-                  [(0)
-                   nil "Highlight specified sets of characters, including whitespace." single
-                   ((:authors
-                     ("Drew Adams"))
-                    (:maintainer nil . "Drew Adams (concat \"drew.adams\" \"@\" \"oracle\" \".com\")")
-                    (:url . "https://www.emacswiki.org/emacs/download/highlight-chars.el"))])
  (fasta .
         [(1 0)
          ((emacs
