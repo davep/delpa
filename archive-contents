@@ -40,9 +40,9 @@
              (:maintainer "Dave Pearson" . "davep@davep.org")
              (:url . "https://github.com/davep/pinboard.el"))])
  (funhead .
-          [(1 13)
+          [(1 14)
            ((emacs
-             (24)))
+             (24 1)))
            "Insert my standard function headers" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))
