@@ -1,4 +1,13 @@
 (1
+ (chrurl .
+         [(1 0)
+          ((emacs
+            (25 1)))
+          "Insert the URL of the 'topmost' Chrome" single
+          ((:authors
+            ("Dave Pearson" . "davep@davep.org"))
+           (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:url . "https://github.com/davep/chrurl.el"))])
  (dnote .
         [(1 0)
          ((emacs
