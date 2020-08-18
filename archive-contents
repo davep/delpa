@@ -49,13 +49,14 @@
              (:maintainer "Dave Pearson" . "davep@davep.org")
              (:url . "https://github.com/davep/pinboard.el"))])
  (funhead .
-          [(1 14)
+          [(1 15)
            ((emacs
              (24 1)))
            "Insert my standard function headers" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))
             (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:keywords "convenience")
             (:url . "https://github.com/davep/funhead.el"))])
  (wordcloud .
             [(1 3)
