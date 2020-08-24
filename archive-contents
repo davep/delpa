@@ -1,4 +1,16 @@
 (1
+ (goto-line-faster .
+                   [(0 1)
+                    ((emacs
+                      (24))
+                     (bind-key
+                      (2 0)))
+                    "Start going to a line number quickly" single
+                    ((:authors
+                      ("Dave Pearson" . "davep@davep.org"))
+                     (:maintainer "Dave Pearson" . "davep@davep.org")
+                     (:keywords "convenience")
+                     (:url . "https://github.com/davep/goto-line-faster.el"))])
  (chrurl .
          [(1 1)
           ((emacs
