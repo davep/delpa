@@ -95,3 +95,5 @@ hangs together.
 And, also.... don't just take my word for it. This is just my way of doing
 things, that works for me. I imagine there's other approaches written by far
 smarter people than me out there; I'd recommend doing more reading.
+
+[//]: # (index.md ends here)
