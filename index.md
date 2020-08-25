@@ -30,7 +30,7 @@ Dur!
 ## Set the GitHub repo to publish pages
 
 In the settings for the repo find the `GitHub Pages` section and set the
-source to the `master` branch (or, I guess, some other branch if that's your
+source to the `main` branch (or, I guess, some other branch if that's your
 thing). Mine looks like this:
 
 ![Setting up for publishing with GitHub pages](README-GitHub-Pages.png)
