@@ -1,6 +1,6 @@
 (1
  (goto-line-faster .
-                   [(1 0)
+                   [(1 1)
                     ((emacs
                       (24))
                      (bind-key

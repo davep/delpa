@@ -7,4 +7,8 @@
 ;; I wrote this because I've never liked 'M-g g' as a way to go to a line
 ;; number, but I'd like to use some of the other M-g-prefixed key bindings
 ;; too. This pretty much gives me the best of both worlds.
+;;
+;; Please note that this version of the code is very different from the
+;; original version, with <URL:https://github.com/phil-s> providing a much
+;; cleaner approach.
 
