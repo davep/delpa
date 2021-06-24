@@ -1,4 +1,14 @@
 (1
+ (mark-paragraph .
+                 [(0 1)
+                  ((emacs
+                    (24)))
+                  "Commands for marking a paragraph" single
+                  ((:authors
+                    ("Dave Pearson" . "davep@davep.org"))
+                   (:maintainer "Dave Pearson" . "davep@davep.org")
+                   (:keywords "convenience")
+                   (:url . "https://github.com/davep/mark-paragraph.el"))])
  (goto-line-faster .
                    [(1 2)
                     ((emacs
