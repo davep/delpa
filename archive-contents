@@ -1,10 +1,8 @@
 (1
  (goto-line-faster .
-                   [(1 1)
+                   [(1 2)
                     ((emacs
-                      (24))
-                     (bind-key
-                      (2 0)))
+                      (24)))
                     "Start going to a line number quickly" single
                     ((:authors
                       ("Dave Pearson" . "davep@davep.org"))
