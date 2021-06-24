@@ -1,6 +1,6 @@
 (1
  (mark-paragraph .
-                 [(0 1)
+                 [(0 2)
                   ((emacs
                     (24)))
                   "Commands for marking a paragraph" single
