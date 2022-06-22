@@ -109,13 +109,14 @@
            (:maintainer "Dave Pearson" . "davep@davep.org")
            (:url . "https://github.com/davep/end-it.el"))])
  (requote .
-          [(1 1)
+          [(1 2)
            ((emacs
-             (24)))
-           "Toggle quotes around a string." single
+             (28 1)))
+           "Toggle quotes around a string" single
            ((:authors
              ("Dave Pearson" . "davep@davep.org"))
             (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:keywords "convenience" "string" "quotes")
             (:url . "https://github.com/davep/requote.el"))])
  (commoji .
           [(1 7)
