@@ -1,4 +1,14 @@
 (1
+ (show-will .
+            [(0 1)
+             ((emacs
+               (24)))
+             "Make it show I can show Will stuff" single
+             ((:authors
+               ("Dave Pearson" . "davep@davep.org"))
+              (:maintainer "Dave Pearson" . "davep@davep.org")
+              (:keywords "convenience")
+              (:url . "https://github.com/davep/show-will.el"))])
  (mark-paragraph .
                  [(0 2)
                   ((emacs
