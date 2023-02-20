@@ -1,4 +1,14 @@
 (1
+ (reframe .
+          [(1 0)
+           ((emacs
+             (24)))
+           "Size/position frames depending where I am" single
+           ((:authors
+             ("Dave Pearson" . "davep@davep.org"))
+            (:maintainer "Dave Pearson" . "davep@davep.org")
+            (:keywords "convenience" "frames")
+            (:url . "https://github.com/davep/reframe.el"))])
  (show-will .
             [(0 1)
              ((emacs
