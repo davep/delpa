@@ -1,6 +1,6 @@
 (1
  (reframe .
-          [(1 1)
+          [(1 2)
            ((emacs
              (24)))
            "Size/position frames depending where I am" single
