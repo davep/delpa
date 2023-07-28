@@ -30,7 +30,7 @@
                    (:keywords "convenience")
                    (:url . "https://github.com/davep/mark-paragraph.el"))])
  (goto-line-faster .
-                   [(1 2)
+                   [(1 3)
                     ((emacs
                       (24)))
                     "Start going to a line number quickly" single
