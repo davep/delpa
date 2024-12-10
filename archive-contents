@@ -130,13 +130,14 @@
                (:maintainer "Dave Pearson" . "davep@davep.org")
                (:url . "https://github.com/davep/make-phony.el"))])
  (end-it .
-         [(1 18)
+         [(1 20)
           ((emacs
             (24)))
           "Add an \"ends here\" marker to a file" single
           ((:authors
             ("Dave Pearson" . "davep@davep.org"))
            (:maintainer "Dave Pearson" . "davep@davep.org")
+           (:keywords "convenience")
            (:url . "https://github.com/davep/end-it.el"))])
  (requote .
           [(1 2)
